@@ -10,41 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-rootProject.name='tuweni'
-include 'bytes'
-include 'concurrent'
-include 'concurrent-coroutines'
-include 'config'
-include 'crypto'
-include 'devp2p'
-include 'dist'
-include 'dns-discovery'
-include 'eth'
-include 'eth2-reference-tests'
-include 'eth-reference-tests'
-include 'eth-repository'
-include 'ethstats'
-include 'gossip'
-include 'hobbits'
-include 'hobbits-relayer'
-include 'io'
-include 'junit'
-include 'kademlia'
-include 'kv'
-include 'les'
-include 'merkle-trie'
-include 'net'
-include 'net-coroutines'
-include 'plumtree'
-include 'progpow'
-include 'rlp'
-include 'rlpx'
-include 'scuttlebutt'
-include 'scuttlebutt-discovery'
-include 'scuttlebutt-handshake'
-include 'scuttlebutt-rpc'
-include 'scuttlebutt-client-lib'
-include 'ssz'
-include 'toml'
-include 'units'
-include 'votechain'
+description = 'Vote-based chain.'
+
+dependencies {
+  compile project(':bytes')
+  compile project(':kv')
+  compile project(':rlp')
+  compile project(':merkle-trie')
+  compile 'com.google.guava:guava'
+
+
+  testCompile 'org.bouncycastle:bcprov-jdk15on'
+  testCompile project(':junit')
+
+  testCompile 'org.junit.jupiter:junit-jupiter-api'
+  testCompile 'org.junit.jupiter:junit-jupiter-params'
+
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine'
+}
