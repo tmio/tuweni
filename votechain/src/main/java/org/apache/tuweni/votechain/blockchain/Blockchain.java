@@ -20,7 +20,6 @@ public final class Blockchain {
     private final KeyValueStore<Bytes32, Block> blockStore;
     private final Map<Long, Block> blockByNumber = new HashMap<>();
     private final Map<Bytes32, Account> accounts = new HashMap<>();
-    private final Map<>
 
     public Blockchain(BlockchainConfiguration config, KeyValueStore<Bytes32, Block> blockStore) {
         this.config = config;
