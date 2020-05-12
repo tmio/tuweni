@@ -25,8 +25,16 @@ public final class Blockchain {
         this.config = config;
         this.blockStore = blockStore;
         this.genesisBlock = createGenesisBlock(config);
+        if (config.getAccounts().isEmpty()) {
+            throw new IllegalArgumentException("initial accounts cannot be empty");
+        }
+        UInt256 sum = UInt256.ZERO;
         for (Account initialAccount: config.getAccounts()) {
+            sum = sum.add(initialAccount.getBalance());
             accounts.put(initialAccount.getId(), new Account(initialAccount.getId(), initialAccount.getBalance()));
+        }
+        if (sum.isZero()) {
+            throw new IllegalArgumentException("initial balances are all empty");
         }
     }
 
