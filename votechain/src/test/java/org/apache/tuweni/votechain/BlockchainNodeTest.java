@@ -17,12 +17,14 @@ import org.apache.tuweni.votechain.network.InProcessNetwork;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(BouncyCastleExtension.class)
 class BlockchainNodeTest {
@@ -50,7 +52,7 @@ class BlockchainNodeTest {
         }
         {
             Blockchain blockchain = new Blockchain(config, MapKeyValueStore.open());
-            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs));
+            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs, blockchain.getBlock(0L).getHash()));
         }
 
         Operation op = new Operation("send");
@@ -87,7 +89,7 @@ class BlockchainNodeTest {
         }
         {
             Blockchain blockchain = new Blockchain(config, MapKeyValueStore.open());
-            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs));
+            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs, blockchain.getBlock(0L).getHash()));
         }
 
         Operation op = new Operation("send");
@@ -132,7 +134,7 @@ class BlockchainNodeTest {
         }
         {
             Blockchain blockchain = new Blockchain(config, MapKeyValueStore.open());
-            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs));
+            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs, blockchain.getBlock(0L).getHash()));
         }
 
         Operation op = new Operation("send");
@@ -169,21 +171,21 @@ class BlockchainNodeTest {
             Blockchain blockchain = new Blockchain(config, MapKeyValueStore.open());
             node2 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, new OnDemandBlockScheduler(), (parentBlock, txs) -> null);
         }
-        {
-            Blockchain blockchain = new Blockchain(config, MapKeyValueStore.open());
-            node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs));
-        }
+        Blockchain blockchain = new Blockchain(config, MapKeyValueStore.open());
+        node3 = new BlockchainNode(SECP256K1.KeyPair.random(), blockchain, network, scheduler, (parentBlock, txs) -> new Block(txs, blockchain.getHeadBlock().getHash()));
 
         for (int i = 0 ; i < 10; i++) {
             Operation op = new Operation("send");
             node3.executeOperation(op);
             scheduler.trigger();
         }
+
+        Block receivedBlock = node2.getBlockchain().getBlock(10L);
+        assertNotNull(receivedBlock);
+        Block receivedBlock2 = node1.getBlockchain().getBlock(10L);
+        assertNotNull(receivedBlock2);
         Block minedBlock = node3.getBlockchain().getBlock(10L);
         assertNotNull(minedBlock);
-        Block receivedBlock = node2.getBlockchain().getBlock(10L);
-        assertNull(receivedBlock);
-        Block receivedBlock2 = node1.getBlockchain().getBlock(10L);
-        assertNull(receivedBlock2);
+        assertTrue(node3.getTransactionPool().getPendingTransactions().isEmpty());
     }
 }

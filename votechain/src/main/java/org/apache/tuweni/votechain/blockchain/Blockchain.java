@@ -1,6 +1,7 @@
 package org.apache.tuweni.votechain.blockchain;
 
 import org.apache.tuweni.bytes.Bytes32;
+import org.apache.tuweni.concurrent.AsyncResult;
 import org.apache.tuweni.kv.KeyValueStore;
 import org.apache.tuweni.units.bigints.UInt256;
 import org.apache.tuweni.votechain.blockchain.ops.Operation;
@@ -19,12 +20,18 @@ public final class Blockchain {
     private final BlockchainConfiguration config;
     private final KeyValueStore<Bytes32, Block> blockStore;
     private final Map<Long, Block> blockByNumber = new HashMap<>();
+    private final Map<Bytes32, Long> numberByHash = new HashMap<>();
     private final Map<Bytes32, Account> accounts = new HashMap<>();
+
+    private volatile Block headBlock;
 
     public Blockchain(BlockchainConfiguration config, KeyValueStore<Bytes32, Block> blockStore) {
         this.config = config;
         this.blockStore = blockStore;
         this.genesisBlock = createGenesisBlock(config);
+        headBlock = genesisBlock;
+        blockByNumber.put(0L, genesisBlock);
+        numberByHash.put(genesisBlock.getHash(), 0L);
         if (config.getAccounts().isEmpty()) {
             throw new IllegalArgumentException("initial accounts cannot be empty");
         }
@@ -39,7 +46,7 @@ public final class Blockchain {
     }
 
     private Block createGenesisBlock(BlockchainConfiguration config) {
-        return new Block(Collections.emptyList());
+        return new Block(Collections.emptyList(), null);
     }
 
     public UInt256 getAccountBalance(Bytes32 accountId) {
@@ -51,13 +58,20 @@ public final class Blockchain {
     }
 
     public Block getHeadBlock() {
-        return genesisBlock;
+        return headBlock;
     }
 
     public void addBlock(Block newBlock) {
-        if (blockByNumber.get(1L) != null) {
-            return;
+        AsyncResult<Block> result = blockStore.getAsync(newBlock.getHash());
+        try {
+            Block block = result.get();
+            if (block != null) {
+                return;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+
         try {
             for (Transaction tx : newBlock.getTransactions()) {
                 for (Operation op : tx.getOperations()) {
@@ -68,8 +82,17 @@ public final class Blockchain {
             return;
         }
 
+        Long parentBlockNumber = numberByHash.get(newBlock.getParentHash());
+        if (parentBlockNumber == null) {
+            return;
+        }
 
-        blockByNumber.put(1L, newBlock);
+        blockByNumber.put(parentBlockNumber + 1, newBlock);
+
+
+        numberByHash.put(newBlock.getHash(), parentBlockNumber + 1);
+        blockStore.putAsync(newBlock.getHash(), newBlock);
+        headBlock = newBlock;
     }
 
     public void addToAccount(Bytes32 id, UInt256 value) {

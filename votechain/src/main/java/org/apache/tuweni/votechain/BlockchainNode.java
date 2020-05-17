@@ -12,7 +12,9 @@ import org.apache.tuweni.votechain.miner.MiningScheduler;
 import org.apache.tuweni.votechain.network.InProcessMessage;
 import org.apache.tuweni.votechain.network.Network;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A BlockchainNode represents a node in a peer-to-peer network running a blockchain.
@@ -46,7 +48,9 @@ public class BlockchainNode {
     }
 
     private void mine() {
-        Block newBlock = minter.mine(blockchain.getHeadBlock(), transactionPool.getPendingTransactions());
+        List<Transaction> txs = new ArrayList<>(transactionPool.getPendingTransactions());
+        transactionPool.getPendingTransactions().clear();
+        Block newBlock = minter.mine(blockchain.getHeadBlock(), txs);
         blockchain.addBlock(newBlock);
         network.send(new InProcessMessage(newBlock));
     }
@@ -62,5 +66,9 @@ public class BlockchainNode {
 
     public Blockchain getBlockchain() {
         return blockchain;
+    }
+
+    public TransactionPool getTransactionPool() {
+        return transactionPool;
     }
 }
