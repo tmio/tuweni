@@ -49,13 +49,14 @@ class MemoryPeerRepository : PeerRepository {
     return identity
   }
 
-  override fun addConnection(peer: Peer, identity: Identity) {
+  override fun addConnection(peer: Peer, identity: Identity): Connection {
     val now = Instant.now()
     val conn = MemoryConnection(true, peer, identity)
     connections[createConnectionKey(peer, identity)] = conn
     (peer as MemoryPeer).connections.add(conn)
     peer.lastContacted = now
     (identity as MemoryIdentity).connections.add(conn)
+    return conn
   }
 
   override fun markConnectionInactive(peer: Peer, identity: Identity) {

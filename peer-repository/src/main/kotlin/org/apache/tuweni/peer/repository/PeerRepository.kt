@@ -30,7 +30,7 @@ interface PeerRepository {
 
   fun storeIdentity(networkInterface: String, port: Int, publicKey: SECP256K1.PublicKey): Identity
 
-  fun addConnection(peer: Peer, identity: Identity)
+  fun addConnection(peer: Peer, identity: Identity): Connection
 
   fun markConnectionInactive(peer: Peer, identity: Identity)
   fun peerDiscoveredAt(peer: Peer, time: Long)
