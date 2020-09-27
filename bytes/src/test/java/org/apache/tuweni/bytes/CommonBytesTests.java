@@ -149,7 +149,7 @@ abstract class CommonBytesTests {
 
   @Test
   void testAsInt() {
-    assertEquals(0, Bytes.EMPTY.toInt());
+    assertEquals(0, Bytes.getEMPTY().toInt());
     Bytes value1 = w(new byte[] {0, 0, 1, 0});
     // 0x00000100 = 256
     assertEquals(256, value1.toInt());
@@ -204,7 +204,7 @@ abstract class CommonBytesTests {
 
   @Test
   void testAsLong() {
-    assertEquals(0, Bytes.EMPTY.toLong());
+    assertEquals(0, Bytes.getEMPTY().toLong());
     Bytes value1 = w(new byte[] {0, 0, 1, 0, -1, -1, -1, -1});
     // 0x00000100FFFFFFFF = (2^40) + (2^32) - 1 = 1103806595071
     assertEquals(1103806595071L, value1.toLong());
@@ -275,8 +275,8 @@ abstract class CommonBytesTests {
 
     // The follow does nothing, but simply making sure it doesn't throw.
     dest = MutableBytes.EMPTY;
-    Bytes.EMPTY.copyTo(dest);
-    assertEquals(Bytes.EMPTY, dest);
+    Bytes.getEMPTY().copyTo(dest);
+    assertEquals(Bytes.getEMPTY(), dest);
 
     dest = MutableBytes.create(1);
     of(1).copyTo(dest);
@@ -314,7 +314,7 @@ abstract class CommonBytesTests {
     MutableBytes dest;
 
     dest = MutableBytes.wrap(new byte[] {1, 2, 3});
-    Bytes.EMPTY.copyTo(dest, 0);
+    Bytes.getEMPTY().copyTo(dest, 0);
     assertEquals(h("0x010203"), dest);
 
     dest = MutableBytes.wrap(new byte[] {1, 2, 3});
@@ -353,8 +353,8 @@ abstract class CommonBytesTests {
 
   @Test
   void testAppendTo() {
-    testAppendTo(Bytes.EMPTY, Buffer.buffer(), Bytes.EMPTY);
-    testAppendTo(Bytes.EMPTY, Buffer.buffer(h("0x1234").toArrayUnsafe()), h("0x1234"));
+    testAppendTo(Bytes.getEMPTY(), Buffer.buffer(), Bytes.getEMPTY());
+    testAppendTo(Bytes.getEMPTY(), Buffer.buffer(h("0x1234").toArrayUnsafe()), h("0x1234"));
     testAppendTo(h("0x1234"), Buffer.buffer(), h("0x1234"));
     testAppendTo(h("0x5678"), Buffer.buffer(h("0x1234").toArrayUnsafe()), h("0x12345678"));
   }
@@ -366,7 +366,7 @@ abstract class CommonBytesTests {
 
   @Test
   void testIsZero() {
-    assertTrue(Bytes.EMPTY.isZero());
+    assertTrue(Bytes.getEMPTY().isZero());
     assertTrue(Bytes.of(0).isZero());
     assertTrue(Bytes.of(0, 0, 0).isZero());
 
@@ -378,7 +378,7 @@ abstract class CommonBytesTests {
 
   @Test
   void testIsEmpty() {
-    assertTrue(Bytes.EMPTY.isEmpty());
+    assertTrue(Bytes.getEMPTY().isEmpty());
 
     assertFalse(Bytes.of(0).isEmpty());
     assertFalse(Bytes.of(0, 0, 0).isEmpty());
@@ -476,8 +476,8 @@ abstract class CommonBytesTests {
 
   @Test
   void slicePastEndReturnsEmpty() {
-    assertEquals(Bytes.EMPTY, Bytes.of(1, 2, 3, 4).slice(4));
-    assertEquals(Bytes.EMPTY, Bytes.of(1, 2, 3, 4).slice(5));
+    assertEquals(Bytes.getEMPTY(), Bytes.of(1, 2, 3, 4).slice(4));
+    assertEquals(Bytes.getEMPTY(), Bytes.of(1, 2, 3, 4).slice(5));
   }
 
   @Test
@@ -534,7 +534,7 @@ abstract class CommonBytesTests {
 
   private void testArrayExtraction(Function<Bytes, byte[]> extractor) {
     byte[] bytes = new byte[0];
-    assertArrayEquals(extractor.apply(Bytes.EMPTY), bytes);
+    assertArrayEquals(extractor.apply(Bytes.getEMPTY()), bytes);
 
     byte[][] toTest = new byte[][] {new byte[] {1}, new byte[] {1, 2, 3, 4, 5, 6}, new byte[] {-1, -1, 0, -1}};
     for (byte[] array : toTest) {
@@ -548,7 +548,7 @@ abstract class CommonBytesTests {
 
   @Test
   void testToString() {
-    assertEquals("0x", Bytes.EMPTY.toString());
+    assertEquals("0x", Bytes.getEMPTY().toString());
 
     assertEquals("0x01", of(1).toString());
     assertEquals("0x0aff03", of(0x0a, 0xff, 0x03).toString());

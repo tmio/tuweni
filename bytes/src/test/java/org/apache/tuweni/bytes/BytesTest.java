@@ -54,7 +54,7 @@ class BytesTest extends CommonBytesTests {
   @Test
   void wrapEmpty() {
     Bytes wrap = Bytes.wrap(new byte[0]);
-    assertEquals(Bytes.EMPTY, wrap);
+    assertEquals(Bytes.Companion.getEMPTY(), wrap);
   }
 
   @ParameterizedTest
@@ -100,9 +100,9 @@ class BytesTest extends CommonBytesTests {
 
   @Test
   void wrapSliceEmpty() {
-    assertEquals(Bytes.EMPTY, Bytes.wrap(new byte[0], 0, 0));
-    assertEquals(Bytes.EMPTY, Bytes.wrap(new byte[] {1, 2, 3}, 0, 0));
-    assertEquals(Bytes.EMPTY, Bytes.wrap(new byte[] {1, 2, 3}, 2, 0));
+    assertEquals(Bytes.getEMPTY(), Bytes.wrap(new byte[0], 0, 0));
+    assertEquals(Bytes.getEMPTY(), Bytes.wrap(new byte[] {1, 2, 3}, 0, 0));
+    assertEquals(Bytes.getEMPTY(), Bytes.wrap(new byte[] {1, 2, 3}, 2, 0));
   }
 
   @ParameterizedTest
@@ -258,13 +258,13 @@ class BytesTest extends CommonBytesTests {
 
   @Test
   void asUnsignedBigIntegerConstants() {
-    assertEquals(bi("0"), Bytes.EMPTY.toUnsignedBigInteger());
+    assertEquals(bi("0"), Bytes.getEMPTY().toUnsignedBigInteger());
     assertEquals(bi("1"), Bytes.of(1).toUnsignedBigInteger());
   }
 
   @Test
   void asSignedBigIntegerConstants() {
-    assertEquals(bi("0"), Bytes.EMPTY.toBigInteger());
+    assertEquals(bi("0"), Bytes.getEMPTY().toBigInteger());
     assertEquals(bi("1"), Bytes.of(1).toBigInteger());
   }
 
@@ -635,13 +635,13 @@ class BytesTest extends CommonBytesTests {
   @Test
   void testWrapByteBufEmpty() {
     ByteBuf buffer = Unpooled.buffer(0);
-    assertSame(Bytes.EMPTY, Bytes.wrapByteBuf(buffer));
+    assertSame(Bytes.getEMPTY(), Bytes.wrapByteBuf(buffer));
   }
 
   @Test
   void testWrapByteBufWithIndexEmpty() {
     ByteBuf buffer = Unpooled.buffer(3);
-    assertSame(Bytes.EMPTY, Bytes.wrapByteBuf(buffer, 3, 0));
+    assertSame(Bytes.getEMPTY(), Bytes.wrapByteBuf(buffer, 3, 0));
   }
 
   @Test

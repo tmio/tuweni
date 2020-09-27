@@ -12,9 +12,6 @@
  */
 package org.apache.tuweni.bytes;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkElementIndex;
-
 import io.netty.buffer.ByteBuf;
 import io.vertx.core.buffer.Buffer;
 
