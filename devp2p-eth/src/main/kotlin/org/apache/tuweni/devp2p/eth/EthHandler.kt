@@ -120,6 +120,7 @@ internal class EthHandler(
     newPooledTransactionHashes: NewPooledTransactionHashes
   ) {
     if (newPooledTransactionHashes.hashes.size > MAX_NEW_POOLED_TX_HASHES) {
+      logger.warn("Received more pending tx hashes than allowed {}", newPooledTransactionHashes.hashes.size)
       service.disconnect(connection, DisconnectReason.SUBPROTOCOL_REASON)
       return
     }

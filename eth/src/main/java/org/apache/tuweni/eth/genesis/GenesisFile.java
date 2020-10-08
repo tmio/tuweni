@@ -103,7 +103,19 @@ public class GenesisFile {
     this.gasLimit = Gas.valueOf(Bytes.fromHexString(gasLimit).toLong());
     this.allocs = new HashMap<>();
     for (Map.Entry<String, String> entry : allocs.entrySet()) {
-      this.allocs.put(Address.fromHexString(entry.getKey()), Wei.valueOf(UInt256.fromHexString(entry.getValue())));
+      Address addr = null;
+      try {
+        addr = Address.fromHexString(entry.getKey());
+      } catch(IllegalArgumentException e) {
+        throw new IllegalArgumentException("Invalid address " + entry.getKey(), e);
+      }
+      Wei value = null;
+      try {
+        value = Wei.valueOf(UInt256.fromHexString(entry.getValue()));
+      } catch(IllegalArgumentException e) {
+        throw new IllegalArgumentException("Invalid balance " + entry.getValue(), e);
+      }
+      this.allocs.put(addr, value);
     }
     this.chainId = chainId;
     this.forks = forks;
@@ -187,7 +199,9 @@ public class GenesisFile {
           value = parser.getValueAsString();
           allocs.put(name, value);
         } else {
-          name = parser.getValueAsString();
+          if (name == null) {
+            name = parser.getValueAsString();
+          }
         }
       } else if (JsonToken.END_OBJECT.equals(jsonToken)) {
         if (closed) {
