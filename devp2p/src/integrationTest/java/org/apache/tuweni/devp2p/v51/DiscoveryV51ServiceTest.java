@@ -13,14 +13,13 @@
 package org.apache.tuweni.devp2p.v51;
 
 import org.apache.tuweni.crypto.SECP256K1;
-import org.apache.tuweni.devp2p.v51.DiscoveryService;
-import org.apache.tuweni.devp2p.v51.DiscoveryV51Service;
 import org.apache.tuweni.junit.BouncyCastleExtension;
+
+import java.net.InetSocketAddress;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.net.InetSocketAddress;
 
 @Timeout(10)
 @ExtendWith(BouncyCastleExtension.class)

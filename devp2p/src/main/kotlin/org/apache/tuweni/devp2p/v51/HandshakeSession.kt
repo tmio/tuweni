@@ -143,8 +143,6 @@ internal class HandshakeSession(
       )
       val authDataToSend = Bytes.wrap(authDataHead, sigBytes, enr().toRLP())
 
-      val secret = SECP256K1.deriveECDHKeyAgreement(ephemeralKey.bytes(), publicKey!!.bytes())
-
       // Derive keys
       val newSession = SessionKeyGenerator.generate(nodeId, destNodeId, secret, message.idNonce)
       val signValue = Bytes.concatenate(DISCOVERY_ID_NONCE, message.idNonce, ephemeralKeyPair.publicKey().bytes())
