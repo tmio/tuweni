@@ -45,6 +45,7 @@ import org.xbill.DNS.Section
 import org.xbill.DNS.SimpleResolver
 import org.xbill.DNS.Type
 import org.xbill.DNS.WireParseException
+import java.net.SocketTimeoutException
 
 /**
  * Resolves a set of ENR nodes from a host name.
@@ -155,6 +156,13 @@ class DNSResolver @JvmOverloads constructor(
         logger.debug("No TXT record for $domainName")
         return null
       }
+    } catch (e: SocketTimeoutException) {
+      if (resolver is SimpleResolver) {
+        logger.warn("Timeout contacting remote DNS server ${resolver.address}", e)
+      } else {
+        logger.warn("Timeout contacting remote DNS server", e)
+      }
+      return null
     } catch (e: WireParseException) {
       logger.error("Error reading TXT record", e)
       return null
