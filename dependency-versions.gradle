@@ -14,6 +14,7 @@ dependencyManagement {
   dependencies {
     dependency('ch.qos.logback:logback-classic:1.2.3')
     dependency('commons-codec:commons-codec:1.14')
+    dependency('com.aparapi:aparapi:2.0.1-SNAPSHOT')
     dependency('com.fasterxml.jackson.core:jackson-databind:2.11.0')
     dependency('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.0')
     dependency('com.github.jnr:jnr-ffi:2.1.9')
