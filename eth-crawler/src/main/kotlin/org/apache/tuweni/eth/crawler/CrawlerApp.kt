@@ -40,6 +40,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.security.Security
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.system.exitProcess
 
 /**
  * Application running as a daemon and quietly collecting information about Ethereum nodes.
@@ -56,7 +57,7 @@ object CrawlerApp {
       for (error in config.config.errors()) {
         println(error.message)
       }
-      System.exit(1)
+      exitProcess(1)
     }
     run(vertx, config)
   }
@@ -120,7 +121,8 @@ object CrawlerApp {
       launch {
         while (refreshLoop.get()) {
           try {
-            for (connectionInfo in repo.getPeers(System.currentTimeMillis() - 60 * 60 * 1000)) {
+            val peers = repo.getPeers(System.currentTimeMillis() - 60 * 60 * 1000, 0, 10)
+            for (connectionInfo in peers) {
               connect(rlpxService, connectionInfo.nodeId, InetSocketAddress(connectionInfo.host, if (connectionInfo.port == 0) 30303 else connectionInfo.port))
             }
           } catch (e: Exception) {
@@ -134,7 +136,8 @@ object CrawlerApp {
       launch {
         while (refreshLoop.get()) {
           try {
-            for (connectionInfo in repo.getPendingPeers()) {
+            val peers = repo.getPendingPeers(10)
+            for (connectionInfo in peers) {
               connect(
                 rlpxService,
                 connectionInfo.nodeId,

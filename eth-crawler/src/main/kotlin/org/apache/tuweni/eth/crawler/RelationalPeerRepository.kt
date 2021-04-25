@@ -140,7 +140,7 @@ open class RelationalPeerRepository(
     dataSource.connection.use { conn ->
       var query = "select distinct nodeinfo.host, nodeinfo.port, nodeinfo.publickey from nodeinfo \n" +
         "  inner join (select id, max(createdAt) as maxCreatedAt from nodeinfo group by id) maxSeen \n" +
-        "  on nodeinfo.id = maxSeen.id and nodeinfo.createdAt = maxSeen.maxCreatedAt where createdAt < ?"
+        "  on nodeinfo.id = maxSeen.id and nodeinfo.createdAt = maxSeen.maxCreatedAt where createdAt < ? order by createdAt desc"
       if (from != null && limit != null) {
         query += " limit $limit offset $from"
       }
@@ -194,17 +194,18 @@ open class RelationalPeerRepository(
     }
   }
 
-  internal fun getPendingPeers(): Set<PeerConnectionInfo> {
+  internal fun getPendingPeers(limit: Int): List<PeerConnectionInfo> {
     dataSource.connection.use { conn ->
       val stmt =
         conn.prepareStatement(
           "select distinct endpoint.host, endpoint.port, identity.publickey from endpoint inner " +
-            "join identity on (endpoint.identity = identity.id) where endpoint.identity NOT IN (select identity from nodeinfo)"
+            "join identity on (endpoint.identity = identity.id) where endpoint.identity NOT IN (select identity from nodeinfo) order by endpoint.lastSeen desc limit ?"
         )
       stmt.use {
         // map results.
+        stmt.setInt(1, limit)
         val rs = stmt.executeQuery()
-        val result = mutableSetOf<PeerConnectionInfo>()
+        val result = mutableListOf<PeerConnectionInfo>()
         while (rs.next()) {
           val pubkey = SECP256K1.PublicKey.fromBytes(Bytes.wrap(rs.getBytes(3)))
           val port = rs.getInt(2)
