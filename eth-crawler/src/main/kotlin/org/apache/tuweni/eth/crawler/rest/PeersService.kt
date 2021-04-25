@@ -41,7 +41,7 @@ class PeersService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  fun get(@QueryParam("from") from: Int = 0, @QueryParam("limit") limit: Int = 10): String {
+  fun get(@QueryParam("from") from: Int? = 0, @QueryParam("limit") limit: Int? = 10): String {
     val repo = context!!.getAttribute("repo") as RelationalPeerRepository
     val peers = repo.getPeersWithInfo(System.currentTimeMillis(), from, limit)
     val result = mapper.writeValueAsString(peers)
