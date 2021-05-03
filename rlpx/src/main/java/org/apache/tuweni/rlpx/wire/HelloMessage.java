@@ -35,7 +35,7 @@ public final class HelloMessage implements WireProtocolMessage {
     this.capabilities = capabilities;
   }
 
-  static HelloMessage create(
+  public static HelloMessage create(
       Bytes nodeId,
       int listenPort,
       int p2pVersion,

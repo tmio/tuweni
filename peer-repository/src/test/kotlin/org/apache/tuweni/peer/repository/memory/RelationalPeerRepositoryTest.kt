@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tuweni.eth.crawler
+package org.apache.tuweni.peer.repository.memory
 
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.runBlocking
 import org.apache.tuweni.crypto.SECP256K1
 import org.apache.tuweni.devp2p.Endpoint
+import org.apache.tuweni.eth.crawler.RelationalPeerRepository
 import org.apache.tuweni.junit.BouncyCastleExtension
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.assertEquals

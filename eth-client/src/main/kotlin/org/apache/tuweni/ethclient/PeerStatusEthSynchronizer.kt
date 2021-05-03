@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import org.apache.tuweni.devp2p.eth.EthClient
 import org.apache.tuweni.eth.Hash
 import org.apache.tuweni.eth.repository.BlockchainRepository
+import org.apache.tuweni.peer.repository.WireConnectionPeerRepositoryAdapter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext

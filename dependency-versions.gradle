@@ -39,6 +39,7 @@ dependencyManagement {
     dependency('org.springframework.boot:spring-boot-starter-thymeleaf:2.4.1')
 
     dependency('io.lettuce:lettuce-core:5.1.3.RELEASE')
+    dependency("io.opentelemetry:opentelemetry-bom:1.1.0")
     dependency('io.vertx:vertx-core:3.9.4')
     dependency('io.vertx:vertx-web-client:3.9.4')
     dependency('io.vertx:vertx-lang-kotlin:3.9.4')
@@ -96,7 +97,6 @@ dependencyManagement {
     dependency('org.miracl.milagro.amcl:milagro-crypto-java:0.4.0')
     dependency('org.mockito:mockito-junit-jupiter:3.3.3')
     dependency('org.postgresql:postgresql:42.2.19')
-
 
     dependency('org.rocksdb:rocksdbjni:5.17.2')
     dependency('org.slf4j:slf4j-api:1.7.30')

@@ -24,6 +24,7 @@ dependencies {
   implementation project(':crypto')
   implementation project(':eth')
   implementation project(':io')
+  implementation project(':peer-repository')
   implementation project(':rlp')
   implementation project(':rlpx')
   implementation project(':units')

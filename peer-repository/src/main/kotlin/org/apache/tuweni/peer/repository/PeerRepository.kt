@@ -17,6 +17,7 @@
 package org.apache.tuweni.peer.repository
 
 import org.apache.tuweni.crypto.SECP256K1
+import org.apache.tuweni.rlpx.wire.HelloMessage
 import java.time.Instant
 
 /**
@@ -24,16 +25,21 @@ import java.time.Instant
  */
 interface PeerRepository {
 
-  fun storePeer(id: Identity, lastContacted: Instant?, lastDiscovered: Instant?): Peer
+  suspend fun storePeer(
+    id: Identity,
+    lastContacted: Instant?,
+    lastDiscovered: Instant?,
+    peerHello: HelloMessage
+  ): Peer
 
-  fun randomPeer(): Peer?
+  suspend fun randomPeer(): Peer?
 
-  fun storeIdentity(networkInterface: String, port: Int, publicKey: SECP256K1.PublicKey): Identity
+  suspend fun storeIdentity(networkInterface: String, port: Int, publicKey: SECP256K1.PublicKey): Identity
 
-  fun addConnection(peer: Peer, identity: Identity)
+  suspend fun addConnection(peer: Peer, identity: Identity)
 
-  fun markConnectionInactive(peer: Peer, identity: Identity)
-  fun peerDiscoveredAt(peer: Peer, time: Long)
+  suspend fun markConnectionInactive(peer: Peer, identity: Identity)
+  suspend fun peerDiscoveredAt(peer: Peer, time: Long)
 }
 
 /**
@@ -47,6 +53,8 @@ interface Peer {
   fun lastContacted(): Instant?
 
   fun lastDiscovered(): Instant?
+
+  fun hello(): HelloMessage
 }
 
 /**

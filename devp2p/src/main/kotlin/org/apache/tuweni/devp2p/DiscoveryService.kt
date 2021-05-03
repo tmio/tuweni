@@ -102,7 +102,7 @@ interface DiscoveryService {
      * @param seq the sequence number of the Ethereum Node Record
      * @param enrData the additional key/value pair entries to broadcast as an Ethereum Node Record (ENR).
      * @param bootstrapURIs the URIs for bootstrap nodes
-     * @param peerRepository a [PeerRepository] for obtaining [Peer] instances
+     * @param peerRepository a [DiscoveryPeerRepository] for obtaining [Peer] instances
      * @param advertiseAddress the IP address to advertise to peers, or `null` if the address of the first bound
      *         interface should be used.
      * @param advertiseUdpPort the UDP port to advertise to peers, or `null` if the bound port should to be used.
@@ -114,20 +114,20 @@ interface DiscoveryService {
      */
     @JvmOverloads
     fun open(
-      vertx: Vertx,
-      keyPair: SECP256K1.KeyPair,
-      port: Int = 0,
-      host: String? = null,
-      seq: Long = Instant.now().toEpochMilli(),
-      enrData: Map<String, Bytes> = emptyMap(),
-      bootstrapURIs: List<URI> = emptyList(),
-      peerRepository: PeerRepository = EphemeralPeerRepository(),
-      advertiseAddress: String? = null,
-      advertiseUdpPort: Int? = null,
-      advertiseTcpPort: Int? = null,
-      routingTable: PeerRoutingTable = DevP2PPeerRoutingTable(keyPair.publicKey()),
-      packetFilter: ((SECP256K1.PublicKey, SocketAddress) -> Boolean)? = null,
-      timeSupplier: () -> Long = CURRENT_TIME_SUPPLIER,
+        vertx: Vertx,
+        keyPair: SECP256K1.KeyPair,
+        port: Int = 0,
+        host: String? = null,
+        seq: Long = Instant.now().toEpochMilli(),
+        enrData: Map<String, Bytes> = emptyMap(),
+        bootstrapURIs: List<URI> = emptyList(),
+        peerRepository: DiscoveryPeerRepository = EphemeralPeerRepository(),
+        advertiseAddress: String? = null,
+        advertiseUdpPort: Int? = null,
+        advertiseTcpPort: Int? = null,
+        routingTable: PeerRoutingTable = DevP2PPeerRoutingTable(keyPair.publicKey()),
+        packetFilter: ((SECP256K1.PublicKey, SocketAddress) -> Boolean)? = null,
+        timeSupplier: () -> Long = CURRENT_TIME_SUPPLIER,
     ): DiscoveryService {
       val bindAddress =
         if (host == null) SocketAddress.inetSocketAddress(port, "127.0.0.1") else SocketAddress.inetSocketAddress(
@@ -160,7 +160,7 @@ interface DiscoveryService {
      * @param seq the sequence number of the Ethereum Node Record
      * @param enrData the additional key/value pair entries to broadcast as an Ethereum Node Record (ENR).
      * @param bootstrapURIs the URIs for bootstrap nodes
-     * @param peerRepository a [PeerRepository] for obtaining [Peer] instances
+     * @param peerRepository a [DiscoveryPeerRepository] for obtaining [Peer] instances
      * @param advertiseAddress the IP address to advertise for incoming packets
      * @param advertiseUdpPort the UDP port to advertise to peers, or `null` if the bound port should to be used.
      * @param advertiseTcpPort the TCP port to advertise to peers, or `null` if it should be the same as the UDP port.
@@ -170,19 +170,19 @@ interface DiscoveryService {
      */
     @JvmOverloads
     fun open(
-      vertx: Vertx,
-      keyPair: SECP256K1.KeyPair,
-      bindAddress: SocketAddress,
-      seq: Long = Instant.now().toEpochMilli(),
-      enrData: Map<String, Bytes> = emptyMap(),
-      bootstrapURIs: List<URI> = emptyList(),
-      peerRepository: PeerRepository = EphemeralPeerRepository(),
-      advertiseAddress: String? = null,
-      advertiseUdpPort: Int? = null,
-      advertiseTcpPort: Int? = null,
-      routingTable: PeerRoutingTable = DevP2PPeerRoutingTable(keyPair.publicKey()),
-      packetFilter: ((SECP256K1.PublicKey, SocketAddress) -> Boolean)? = null,
-      timeSupplier: () -> Long = CURRENT_TIME_SUPPLIER,
+        vertx: Vertx,
+        keyPair: SECP256K1.KeyPair,
+        bindAddress: SocketAddress,
+        seq: Long = Instant.now().toEpochMilli(),
+        enrData: Map<String, Bytes> = emptyMap(),
+        bootstrapURIs: List<URI> = emptyList(),
+        peerRepository: DiscoveryPeerRepository = EphemeralPeerRepository(),
+        advertiseAddress: String? = null,
+        advertiseUdpPort: Int? = null,
+        advertiseTcpPort: Int? = null,
+        routingTable: PeerRoutingTable = DevP2PPeerRoutingTable(keyPair.publicKey()),
+        packetFilter: ((SECP256K1.PublicKey, SocketAddress) -> Boolean)? = null,
+        timeSupplier: () -> Long = CURRENT_TIME_SUPPLIER,
     ): DiscoveryService {
       return CoroutineDiscoveryService(
         vertx,
@@ -288,21 +288,21 @@ interface DiscoveryService {
 
 @OptIn(ObsoleteCoroutinesApi::class)
 internal class CoroutineDiscoveryService constructor(
-  vertx: Vertx,
-  private val keyPair: SECP256K1.KeyPair,
-  private val seq: Long = Instant.now().toEpochMilli(),
-  private val enrData: Map<String, Bytes>,
-  private val bindAddress: SocketAddress,
-  private val bootstrapURIs: List<URI> = emptyList(),
-  private val advertiseAddress: String? = null,
-  private val advertiseUdpPort: Int? = null,
-  private val advertiseTcpPort: Int? = null,
-  private val peerRepository: PeerRepository = EphemeralPeerRepository(),
-  private val routingTable: PeerRoutingTable = DevP2PPeerRoutingTable(keyPair.publicKey()),
-  private val packetFilter: ((SECP256K1.PublicKey, SocketAddress) -> Boolean)? = null,
-  private val timeSupplier: () -> Long = DiscoveryService.CURRENT_TIME_SUPPLIER,
-  private val job: Job = Job(),
-  override val coroutineContext: CoroutineContext = job + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> },
+    vertx: Vertx,
+    private val keyPair: SECP256K1.KeyPair,
+    private val seq: Long = Instant.now().toEpochMilli(),
+    private val enrData: Map<String, Bytes>,
+    private val bindAddress: SocketAddress,
+    private val bootstrapURIs: List<URI> = emptyList(),
+    private val advertiseAddress: String? = null,
+    private val advertiseUdpPort: Int? = null,
+    private val advertiseTcpPort: Int? = null,
+    private val peerRepository: DiscoveryPeerRepository = EphemeralPeerRepository(),
+    private val routingTable: PeerRoutingTable = DevP2PPeerRoutingTable(keyPair.publicKey()),
+    private val packetFilter: ((SECP256K1.PublicKey, SocketAddress) -> Boolean)? = null,
+    private val timeSupplier: () -> Long = DiscoveryService.CURRENT_TIME_SUPPLIER,
+    private val job: Job = Job(),
+    override val coroutineContext: CoroutineContext = job + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> },
 ) : DiscoveryService, CoroutineScope {
 
   companion object {

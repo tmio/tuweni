@@ -24,7 +24,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.apache.tuweni.concurrent.ExpiringSet
-import org.apache.tuweni.concurrent.coroutines.await
 import org.apache.tuweni.crypto.SECP256K1
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.net.URI
@@ -72,13 +71,13 @@ object ScraperApp {
  * The scraper sends events of discoveries to listeners.
  */
 class Scraper(
-  override val coroutineContext: CoroutineContext = Executors.newFixedThreadPool(100).asCoroutineDispatcher(),
-  val vertx: Vertx = Vertx.vertx(),
-  val initialURIs: List<URI>,
-  val bindAddress: SocketAddress,
-  val repository: PeerRepository,
-  val listeners: List<(Peer) -> Unit>? = null,
-  val waitSecondsBetweenScrapes: Long = 30,
+    override val coroutineContext: CoroutineContext = Executors.newFixedThreadPool(100).asCoroutineDispatcher(),
+    val vertx: Vertx = Vertx.vertx(),
+    val initialURIs: List<URI>,
+    val bindAddress: SocketAddress,
+    val repository: DiscoveryPeerRepository,
+    val listeners: List<(Peer) -> Unit>? = null,
+    val waitSecondsBetweenScrapes: Long = 30,
 ) : CoroutineScope {
 
   private var service: DiscoveryService? = null

@@ -17,6 +17,7 @@
 package org.apache.tuweni.ethclient
 
 import org.apache.tuweni.devp2p.eth.ConnectionSelectionStrategy
+import org.apache.tuweni.peer.repository.WireConnectionPeerRepositoryAdapter
 import org.apache.tuweni.rlpx.wire.WireConnection
 
 class ConnectionManagementStrategy(

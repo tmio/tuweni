@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tuweni.devp2p
+package org.apache.tuweni.peer.repository
 
 import org.apache.tuweni.crypto.SECP256K1
 
 /**
  * An Ethereum P2P network peer.
  */
-interface Peer {
+interface DiscoveryPeer {
 
   /**
    * The nodeId for this peer.

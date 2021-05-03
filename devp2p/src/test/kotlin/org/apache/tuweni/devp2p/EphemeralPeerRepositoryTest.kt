@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(BouncyCastleExtension::class)
 internal class EphemeralPeerRepositoryTest {
 
-  private lateinit var peerRepository: PeerRepository
+  private lateinit var peerRepository: DiscoveryPeerRepository
   private var currentTime: Long = System.currentTimeMillis()
 
   @BeforeEach

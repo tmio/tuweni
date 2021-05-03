@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tuweni.devp2p
+package org.apache.tuweni.peer.repository
 
 import kotlinx.coroutines.GlobalScope
 import org.apache.tuweni.concurrent.AsyncResult
@@ -27,15 +27,15 @@ import java.util.concurrent.ConcurrentHashMap
  * A repository of peers in an Ethereum network.
  *
  * Conceptually, this repository stores information about <i>all</i> peers in an Ethereum network, hence the
- * retrieval methods always return a valid [Peer]. However, the [Peer] objects are only generated on demand and
+ * retrieval methods always return a valid [DiscoveryPeer]. However, the [DiscoveryPeer] objects are only generated on demand and
  * may be purged from underlying storage if they can be recreated easily.
  */
-interface PeerRepository {
+interface DiscoveryPeerRepository {
 
   /**
    * Adds a listener to the repository, which will consume peer entries whenever they are added to the repository.
    */
-  fun addListener(listener: (Peer) -> Unit)
+  fun addListener(listener: (DiscoveryPeer) -> Unit)
 
   /**
    *  Get a Peer based on a URI components.
@@ -47,7 +47,7 @@ interface PeerRepository {
    * @param port the peer port
    * @param nodeId the public key associated with the peer
    */
-  suspend fun get(host: String, port: Int, nodeId: SECP256K1.PublicKey): Peer
+  suspend fun get(host: String, port: Int, nodeId: SECP256K1.PublicKey): DiscoveryPeer
 
   /**
    * Get a Peer based on a URI.
@@ -59,7 +59,7 @@ interface PeerRepository {
    * @return the peer
    * @throws IllegalArgumentException if the URI is not a valid enode URI
    */
-  suspend fun get(uri: URI): Peer
+  suspend fun get(uri: URI): DiscoveryPeer
 
   /**
    * Get a Peer based on a URI.
@@ -71,7 +71,7 @@ interface PeerRepository {
    * @return the peer
    * @throws IllegalArgumentException if the URI is not a valid enode URI
    */
-  fun getAsync(uri: URI): AsyncResult<Peer>
+  fun getAsync(uri: URI): AsyncResult<DiscoveryPeer>
 
   /**
    * Get a Peer based on a URI string.
@@ -95,7 +95,7 @@ interface PeerRepository {
    * @return the peer
    * @throws IllegalArgumentException if the URI is not a valid enode URI
    */
-  fun getAsync(uri: String): AsyncResult<Peer>
+  fun getAsync(uri: String): AsyncResult<DiscoveryPeer>
 }
 
 /**
@@ -103,12 +103,12 @@ interface PeerRepository {
  *
  * Note: as the storage is in-memory, no retrieval methods in this implementation will suspend.
  */
-class EphemeralPeerRepository(private val peers: MutableMap<SECP256K1.PublicKey, Peer> = ConcurrentHashMap()) :
-  PeerRepository {
+class EphemeralPeerRepository(private val peers: MutableMap<SECP256K1.PublicKey, DiscoveryPeer> = ConcurrentHashMap()) :
+  DiscoveryPeerRepository {
 
-  private val listeners = mutableListOf<(Peer) -> Unit>()
+  private val listeners = mutableListOf<(DiscoveryPeer) -> Unit>()
 
-  override fun addListener(listener: (Peer) -> Unit) {
+  override fun addListener(listener: (DiscoveryPeer) -> Unit) {
     listeners.add(listener)
   }
 
@@ -131,25 +131,25 @@ class EphemeralPeerRepository(private val peers: MutableMap<SECP256K1.PublicKey,
       } else {
         peer
       }
-    } as Peer
+    } as DiscoveryPeer
 
-  override suspend fun get(host: String, port: Int, nodeId: SECP256K1.PublicKey): Peer {
+  override suspend fun get(host: String, port: Int, nodeId: SECP256K1.PublicKey): DiscoveryPeer {
     return get(nodeId, Endpoint(host, port))
   }
 
-  override suspend fun get(uri: URI): Peer {
+  override suspend fun get(uri: URI): DiscoveryPeer {
     val (nodeId, endpoint) = parseEnodeUri(uri)
     return get(nodeId, endpoint)
   }
 
-  override fun getAsync(uri: URI): AsyncResult<Peer> = GlobalScope.asyncResult { get(uri) }
+  override fun getAsync(uri: URI): AsyncResult<DiscoveryPeer> = GlobalScope.asyncResult { get(uri) }
 
-  override fun getAsync(uri: String): AsyncResult<Peer> = GlobalScope.asyncResult { get(uri) }
+  override fun getAsync(uri: String): AsyncResult<DiscoveryPeer> = GlobalScope.asyncResult { get(uri) }
 
   private inner class EphemeralPeer(
     override val nodeId: SECP256K1.PublicKey,
     knownEndpoint: Endpoint,
-  ) : Peer {
+  ) : DiscoveryPeer {
     @Volatile
     override var endpoint: Endpoint = knownEndpoint
 

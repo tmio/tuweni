@@ -18,7 +18,7 @@ package org.apache.tuweni.ethclient
 
 import kotlinx.coroutines.runBlocking
 import org.apache.tuweni.kv.MapKeyValueStore
-import org.apache.tuweni.peer.repository.memory.MemoryPeerRepository
+import org.apache.tuweni.peer.repository.MemoryEthereumPeerRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -27,7 +27,7 @@ class DNSClientRunTest {
   fun testStartAndStop() {
     val client = DNSClient(
       DNSConfigurationImpl("default", "foo", "example.com", 1000),
-      MapKeyValueStore.open(), MemoryPeerRepository()
+      MapKeyValueStore.open(), MemoryEthereumPeerRepository()
     )
     runBlocking {
       client.start()
@@ -39,7 +39,7 @@ class DNSClientRunTest {
   fun changeSeq() {
     val client = DNSClient(
       DNSConfigurationImpl("default", "foo", "example.com", 1000),
-      MapKeyValueStore.open(), MemoryPeerRepository()
+      MapKeyValueStore.open(), MemoryEthereumPeerRepository()
     )
     runBlocking {
       client.seq(42L)

@@ -34,6 +34,7 @@ import org.apache.tuweni.eth.genesis.GenesisFile
 import org.apache.tuweni.eth.repository.BlockchainIndex
 import org.apache.tuweni.eth.repository.BlockchainRepository
 import org.apache.tuweni.eth.repository.MemoryTransactionPool
+import org.apache.tuweni.peer.repository.WireConnectionPeerRepositoryAdapter
 import org.apache.tuweni.kv.LevelDBKeyValueStore
 import org.apache.tuweni.kv.MapKeyValueStore
 import org.apache.tuweni.rlpx.RLPxService

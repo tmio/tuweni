@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tuweni.ethclient
+package org.apache.tuweni.peer.repository
 
 import org.apache.tuweni.devp2p.eth.Status
 import org.apache.tuweni.rlpx.WireConnectionRepository
@@ -31,7 +31,6 @@ class WireConnectionPeerRepositoryAdapter(val peerRepository: EthereumPeerReposi
   private val wireConnectionToIdentities = ConcurrentHashMap<String, String>()
   private val connections = ConcurrentHashMap<String, WireConnection>()
   private val connectionListeners = ArrayList<WireConnectionRepository.Listener>()
-
   private val disconnectionListeners = ArrayList<WireConnectionRepository.Listener>()
 
   override fun addConnectionListener(listener: WireConnectionRepository.Listener) {
@@ -46,7 +45,7 @@ class WireConnectionPeerRepositoryAdapter(val peerRepository: EthereumPeerReposi
     val id =
       peerRepository.storeIdentity(wireConnection.peerHost(), wireConnection.peerPort(), wireConnection.peerPublicKey())
 
-    val peer = peerRepository.storePeer(id, Instant.now(), Instant.now())
+    val peer = peerRepository.storePeer(id, Instant.now(), Instant.now(), wireConnection.peerHello)
     peerRepository.addConnection(peer, id)
     connections[id.id()] = wireConnection
     wireConnectionToIdentities[wireConnection.uri()] = id.id()
@@ -80,6 +79,6 @@ class WireConnectionPeerRepositoryAdapter(val peerRepository: EthereumPeerReposi
   fun get(ethereumConnection: EthereumConnection): WireConnection? = connections[ethereumConnection.identity().id()]
 
   fun listenToStatus(conn: WireConnection, status: Status) {
-    wireConnectionToIdentities[conn.uri()]?.let { peerRepository.storeStatus(it, status) }
+    wireConnectionToIdentities[conn.uri()]?.let { peerRepository.storeStatus(conn, status) }
   }
 }

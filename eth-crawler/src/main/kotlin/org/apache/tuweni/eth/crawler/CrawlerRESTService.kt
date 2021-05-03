@@ -19,6 +19,7 @@ package org.apache.tuweni.eth.crawler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import org.apache.tuweni.peer.repository.RelationalPeerRepository
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.glassfish.jersey.servlet.ServletContainer

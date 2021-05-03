@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tuweni.devp2p
+package org.apache.tuweni.peer.repository
 
 import io.vertx.core.net.SocketAddress
 import org.apache.tuweni.rlp.RLPException

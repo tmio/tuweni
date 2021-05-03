@@ -18,6 +18,7 @@ package org.apache.tuweni.peer.repository.memory
 
 import org.apache.tuweni.crypto.SECP256K1
 import org.apache.tuweni.junit.BouncyCastleExtension
+import org.apache.tuweni.rlpx.wire.HelloMessage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -39,7 +40,14 @@ class MemoryPeerRepositoryTest {
   fun testStorePeerAndIdentity() {
     val repo = MemoryPeerRepository()
     val identity = repo.storeIdentity("0.0.0.0", 12345, SECP256K1.KeyPair.random().publicKey())
-    val peer = repo.storePeer(identity, Instant.now(), Instant.now())
+    val peer = repo.storePeer(identity,
+      Instant.now(),
+      Instant.now(),
+      HelloMessage.create(SECP256K1.KeyPair.random().publicKey().bytes(),
+        30303,
+        1,
+        "blah",
+        emptyList()))
     repo.addConnection(peer, identity)
     assertEquals(1, peer.connections().size)
     assertEquals(1, identity.connections().size)
@@ -55,7 +63,11 @@ class MemoryPeerRepositoryTest {
     val repo = MemoryPeerRepository()
     val identity = repo.storeIdentity("0.0.0.0", 12345, SECP256K1.KeyPair.random().publicKey())
     val fiveSecondsAgo = Instant.now().minus(5, ChronoUnit.SECONDS)
-    val peer = repo.storePeer(identity, fiveSecondsAgo, Instant.now())
+    val peer = repo.storePeer(identity, fiveSecondsAgo, Instant.now(), HelloMessage.create(SECP256K1.KeyPair.random().publicKey().bytes(),
+      30303,
+      1,
+      "blah",
+      emptyList()))
     repo.addConnection(peer, identity)
     assertTrue(peer.lastContacted()!!.isAfter(fiveSecondsAgo))
   }

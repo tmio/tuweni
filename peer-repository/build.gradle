@@ -14,14 +14,26 @@ description = 'Peer repository library.'
 
 dependencies {
   implementation 'com.google.guava:guava'
+  implementation 'io.vertx:vertx-core'
+  implementation 'org.bouncycastle:bcprov-jdk15on'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core'
   implementation 'org.slf4j:slf4j-api'
+  implementation project(':bytes')
+  implementation project(':concurrent')
+  implementation project(':concurrent-coroutines')
   implementation project(':crypto')
+  implementation project(':devp2p-eth')
+  implementation project(':rlp')
+  implementation project(':rlpx')
+  implementation project(':units')
 
   testImplementation project(':junit')
   testImplementation 'org.bouncycastle:bcprov-jdk15on'
   testImplementation 'org.junit.jupiter:junit-jupiter-api'
   testImplementation 'org.junit.jupiter:junit-jupiter-params'
+
+  testImplementation 'com.zaxxer:HikariCP'
+  testImplementation 'org.flywaydb:flyway-core'
 
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }

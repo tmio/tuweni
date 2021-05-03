@@ -19,6 +19,7 @@ package org.apache.tuweni.ethclient
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.apache.tuweni.crypto.SECP256K1
+import org.apache.tuweni.peer.repository.WireConnectionPeerRepositoryAdapter
 import org.apache.tuweni.junit.BouncyCastleExtension
 import org.apache.tuweni.rlpx.wire.WireConnection
 import org.junit.jupiter.api.Assertions.assertEquals

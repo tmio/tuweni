@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tuweni.ethclient
+package org.apache.tuweni.peer.repository
 
 import org.apache.tuweni.crypto.SECP256K1
 import org.apache.tuweni.devp2p.eth.Status
@@ -22,6 +22,8 @@ import org.apache.tuweni.peer.repository.Connection
 import org.apache.tuweni.peer.repository.Identity
 import org.apache.tuweni.peer.repository.Peer
 import org.apache.tuweni.peer.repository.PeerRepository
+import org.apache.tuweni.rlpx.wire.HelloMessage
+import org.apache.tuweni.rlpx.wire.WireConnection
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -33,10 +35,10 @@ import java.util.stream.Stream
 interface EthereumPeerRepository : PeerRepository {
   /**
    * Stores the status message sent for a connection
-   * @param connId the ID of the connection
+   * @param connId the connection
    * @param status the status message
    */
-  fun storeStatus(connId: String, status: Status)
+  fun storeStatus(conn: WireConnection, status: Status)
 
   /**
    * Provides a stream of active connections.
@@ -87,8 +89,8 @@ class MemoryEthereumPeerRepository : EthereumPeerRepository {
   val statusListeners = HashMap<String, (EthereumConnection) -> Unit>()
   val identityListeners = HashMap<String, (Identity) -> Unit>()
 
-  override fun storeStatus(connId: String, status: Status) {
-    connections[connId]?.let { conn ->
+  override fun storeStatus(connection: WireConnection, status: Status) {
+    connections[connection.uri()]?.let { conn ->
       (conn as MemoryEthereumConnection).status = status
       statusListeners.values.forEach {
         it(conn)
@@ -120,15 +122,20 @@ class MemoryEthereumPeerRepository : EthereumPeerRepository {
     return connections.values.stream().filter { it.active() }
   }
 
-  override fun storePeer(id: Identity, lastContacted: Instant?, lastDiscovered: Instant?): Peer {
-    val peer = MemoryEthereumPeer(id, lastContacted, lastDiscovered)
+  override suspend fun storePeer(
+    id: Identity,
+    lastContacted: Instant?,
+    lastDiscovered: Instant?,
+    peerHello: HelloMessage
+  ): Peer {
+    val peer = MemoryEthereumPeer(id, lastContacted, lastDiscovered, peerHello)
     peerMap[peer.id()] = peer
     return peer
   }
 
-  override fun randomPeer(): Peer? = peerMap.values.firstOrNull()
+  override suspend fun randomPeer(): Peer? = peerMap.values.firstOrNull()
 
-  override fun storeIdentity(networkInterface: String, port: Int, publicKey: SECP256K1.PublicKey): Identity {
+  override suspend fun storeIdentity(networkInterface: String, port: Int, publicKey: SECP256K1.PublicKey): Identity {
     val identity = MemoryEthereumIdentity(networkInterface, port, publicKey)
     identities.add(identity)
     identityListeners.values.forEach {
@@ -137,7 +144,7 @@ class MemoryEthereumPeerRepository : EthereumPeerRepository {
     return identity
   }
 
-  override fun addConnection(peer: Peer, identity: Identity) {
+  override suspend fun addConnection(peer: Peer, identity: Identity) {
     val now = Instant.now()
     val conn = MemoryEthereumConnection(true, peer, identity)
     connections[createConnectionKey(peer, identity)] = conn
@@ -146,11 +153,11 @@ class MemoryEthereumPeerRepository : EthereumPeerRepository {
     (identity as MemoryEthereumIdentity).connections.add(conn)
   }
 
-  override fun markConnectionInactive(peer: Peer, identity: Identity) {
+  override suspend fun markConnectionInactive(peer: Peer, identity: Identity) {
     (connections[createConnectionKey(peer, identity)] as MemoryEthereumConnection).active = false
   }
 
-  override fun peerDiscoveredAt(peer: Peer, time: Long) {
+  override suspend fun peerDiscoveredAt(peer: Peer, time: Long) {
     val timestamp = Instant.ofEpochMilli(time)
     val lastDiscovered = peer.lastDiscovered()
     if (lastDiscovered == null || lastDiscovered.isBefore(timestamp)) {
@@ -165,7 +172,8 @@ class MemoryEthereumPeerRepository : EthereumPeerRepository {
 internal data class MemoryEthereumPeer(
   private val id: Identity,
   internal var lastContacted: Instant?,
-  internal var lastDiscovered: Instant?
+  internal var lastDiscovered: Instant?,
+  internal var helloMessage: HelloMessage
 ) : Peer {
   val connections: MutableList<Connection> = mutableListOf()
 
@@ -176,6 +184,8 @@ internal data class MemoryEthereumPeer(
   override fun lastContacted(): Instant? = lastContacted
 
   override fun lastDiscovered(): Instant? = lastDiscovered
+
+  override fun hello(): HelloMessage = helloMessage
 }
 
 internal data class MemoryEthereumConnection(

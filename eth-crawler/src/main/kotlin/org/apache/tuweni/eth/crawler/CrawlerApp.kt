@@ -29,12 +29,14 @@ import org.apache.tuweni.devp2p.eth.EthHelloSubprotocol
 import org.apache.tuweni.devp2p.eth.SimpleBlockchainInformation
 import org.apache.tuweni.devp2p.eth.logger
 import org.apache.tuweni.eth.genesis.GenesisFile
+import org.apache.tuweni.peer.repository.RelationalPeerRepository
 import org.apache.tuweni.rlpx.RLPxService
 import org.apache.tuweni.rlpx.vertx.VertxRLPxService
 import org.apache.tuweni.rlpx.wire.DisconnectReason
 import org.apache.tuweni.units.bigints.UInt256
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.flywaydb.core.Flyway
+import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -45,6 +47,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Application running as a daemon and quietly collecting information about Ethereum nodes.
  */
 object CrawlerApp {
+
+  val logger = LoggerFactory.getLogger(CrawlerApp.javaClass)
 
   @JvmStatic
   fun main(args: Array<String>) {

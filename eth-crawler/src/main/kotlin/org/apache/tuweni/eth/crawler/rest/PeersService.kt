@@ -18,7 +18,7 @@ package org.apache.tuweni.eth.crawler.rest
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.tuweni.eth.EthJsonModule
-import org.apache.tuweni.eth.crawler.RelationalPeerRepository
+import org.apache.tuweni.peer.repository.RelationalPeerRepository
 import javax.servlet.ServletContext
 import javax.ws.rs.GET
 import javax.ws.rs.Path

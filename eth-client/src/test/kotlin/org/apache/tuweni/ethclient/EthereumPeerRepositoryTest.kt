@@ -38,7 +38,7 @@ class MemoryEthereumPeerRepositoryTest {
   fun testStorePeerAndIdentity() {
     val repo = MemoryPeerRepository()
     val identity = repo.storeIdentity("0.0.0.0", 12345, SECP256K1.KeyPair.random().publicKey())
-    val peer = repo.storePeer(identity, Instant.now(), Instant.now())
+    val peer = repo.storePeer(identity, Instant.now(), Instant.now(), wireConnection.peerHello)
     repo.addConnection(peer, identity)
     Assertions.assertEquals(1, peer.connections().size)
     Assertions.assertEquals(1, identity.connections().size)
@@ -54,7 +54,7 @@ class MemoryEthereumPeerRepositoryTest {
     val repo = MemoryPeerRepository()
     val identity = repo.storeIdentity("0.0.0.0", 12345, SECP256K1.KeyPair.random().publicKey())
     val fiveSecondsAgo = Instant.now().minus(5, ChronoUnit.SECONDS)
-    val peer = repo.storePeer(identity, fiveSecondsAgo, Instant.now())
+    val peer = repo.storePeer(identity, fiveSecondsAgo, Instant.now(), wireConnection.peerHello)
     repo.addConnection(peer, identity)
     Assertions.assertTrue(peer.lastContacted()!!.isAfter(fiveSecondsAgo))
   }
