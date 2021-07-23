@@ -18,6 +18,7 @@ dependencies {
   implementation "com.google.guava:guava"
   implementation "org.jetbrains.kotlin:kotlin-stdlib"
   implementation 'io.vertx:vertx-core'
+  implementation 'io.vertx:vertx-web'
   implementation 'io.vertx:vertx-web-client'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core'
   implementation 'io.vertx:vertx-lang-kotlin-coroutines'
@@ -28,6 +29,8 @@ dependencies {
   implementation project(':eth')
   implementation project(':units')
 
+  testImplementation project(':io')
+  testImplementation project(':concurrent-coroutines')
   testImplementation project(':junit')
   testImplementation 'org.bouncycastle:bcprov-jdk15on'
   testImplementation 'org.junit.jupiter:junit-jupiter-api'
