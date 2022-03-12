@@ -76,7 +76,7 @@ data class LightClient(override val vertx: Vertx, override val name: String, ove
   }
 }
 
-data class BlockProducer(override val vertx: Vertx, override val name: String, override val port: Int) :
+data class TransactionProducer(override val vertx: Vertx, override val name: String, override val port: Int) :
   Peer(vertx, name, port) {
 
   var counter = 0L
@@ -113,11 +113,11 @@ data class BlockProducer(override val vertx: Vertx, override val name: String, o
 
 }
 
-class Network(val blockProducer: BlockProducer, val fullNodes: List<FullNode>, val lightClients: List<LightClient>) {
+class Network(val transactionProducer: TransactionProducer, val fullNodes: List<FullNode>, val lightClients: List<LightClient>) {
 
   fun start() {
     // start the block producer:
-    blockProducer.start()
+    transactionProducer.start()
     // start the full nodes
     for (fullNode in fullNodes) {
       fullNode.start()
@@ -128,7 +128,7 @@ class Network(val blockProducer: BlockProducer, val fullNodes: List<FullNode>, v
     }
     // connect them all!
     for (fullNode in fullNodes) {
-      fullNode.connect(blockProducer.port)
+      fullNode.connect(transactionProducer.port)
       for (otherFullNode in fullNodes) {
         if (fullNode == otherFullNode) {
           continue
@@ -137,7 +137,7 @@ class Network(val blockProducer: BlockProducer, val fullNodes: List<FullNode>, v
       }
     }
     for (lightClient in lightClients) {
-      lightClient.connect(blockProducer.port)
+      lightClient.connect(transactionProducer.port)
       for (fullNode in fullNodes) {
         lightClient.connect(fullNode.port)
       }
@@ -151,7 +151,7 @@ class Network(val blockProducer: BlockProducer, val fullNodes: List<FullNode>, v
   }
 
   fun stop() {
-    blockProducer.stop()
+    transactionProducer.stop()
     for (fullNode in fullNodes) {
       fullNode.stop()
     }
