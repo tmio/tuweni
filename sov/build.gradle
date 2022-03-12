@@ -17,6 +17,7 @@ dependencies {
   implementation project(':concurrent')
   implementation project(':crypto')
   implementation project(':eth')
+  implementation project(':units')
   implementation project(':plumtree')
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'

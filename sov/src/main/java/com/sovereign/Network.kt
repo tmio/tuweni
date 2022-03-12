@@ -5,13 +5,19 @@ import io.vertx.core.Vertx
 import org.apache.tuweni.bytes.Bytes
 import org.apache.tuweni.bytes.Bytes32
 import org.apache.tuweni.crypto.Hash
+import org.apache.tuweni.crypto.SECP256K1
+import org.apache.tuweni.eth.Address
 import org.apache.tuweni.eth.EthJsonModule
+import org.apache.tuweni.eth.Transaction
 import org.apache.tuweni.plumtree.EphemeralPeerRepository
 import org.apache.tuweni.plumtree.vertx.VertxGossipServer
+import org.apache.tuweni.units.bigints.UInt256
+import org.apache.tuweni.units.ethereum.Gas
+import org.apache.tuweni.units.ethereum.Wei
 import java.util.Timer
 import java.util.TimerTask
 
-open class Peer(open val vertx : Vertx, open val name : String, open val port : Int) {
+open class Peer(open val vertx: Vertx, open val name: String, open val port: Int) {
   protected var server: VertxGossipServer? = null
 
   private val mapper = ObjectMapper()
@@ -20,16 +26,25 @@ open class Peer(open val vertx : Vertx, open val name : String, open val port : 
     mapper.registerModule(EthJsonModule())
   }
 
-  open fun newMessage(message : Message) {
+  open fun newMessage(message: Message) {
   }
 
-  private fun deserializeAndHandle(messageBody: Bytes, @Suppress("UNUSED_PARAMETER") attributes : String) {
-    val message : Message = mapper.readerFor(Message::class.java).readValue(messageBody.toArrayUnsafe())
+  private fun deserializeAndHandle(messageBody: Bytes, @Suppress("UNUSED_PARAMETER") attributes: String) {
+    val message: Message = mapper.readerFor(Message::class.java).readValue(messageBody.toArrayUnsafe())
     newMessage(message)
   }
 
   open fun start() {
-    server = VertxGossipServer(vertx, "localhost", port, Hash::keccak256, EphemeralPeerRepository(), this::deserializeAndHandle, null, null, 1000, 1000)
+    server = VertxGossipServer(vertx,
+      "localhost",
+      port,
+      Hash::keccak256,
+      EphemeralPeerRepository(),
+      this::deserializeAndHandle,
+      null,
+      null,
+      1000,
+      1000)
     server?.start()
   }
 
@@ -42,27 +57,30 @@ open class Peer(open val vertx : Vertx, open val name : String, open val port : 
   }
 }
 
-data class FullNode(override val vertx : Vertx, override val name : String, override val port : Int) : Peer(vertx, name, port) {
+data class FullNode(override val vertx: Vertx, override val name: String, override val port: Int) :
+  Peer(vertx, name, port) {
 
   override fun newMessage(message: Message) {
     if (message is TransactionData) {
-      println("$name-${message.txNumber}")
+      println("$name-${message.tx!!.hash}")
     }
   }
 }
 
-data class LightClient(override val vertx : Vertx, override val name : String, override val port : Int) : Peer(vertx, name, port) {
+data class LightClient(override val vertx: Vertx, override val name: String, override val port: Int) :
+  Peer(vertx, name, port) {
   override fun newMessage(message: Message) {
     if (message is TransactionData) {
-      println("$name-${message.txNumber}")
+      println("$name-${message.tx!!.hash}")
     }
   }
 }
 
-data class BlockProducer(override val vertx : Vertx, override val name : String, override val port : Int) : Peer(vertx, name, port) {
+data class BlockProducer(override val vertx: Vertx, override val name: String, override val port: Int) :
+  Peer(vertx, name, port) {
 
   var counter = 0L
-  var newBlockSender : Timer? = null
+  var newBlockSender: Timer? = null
   val mapper = ObjectMapper()
 
   init {
@@ -74,7 +92,14 @@ data class BlockProducer(override val vertx : Vertx, override val name : String,
     newBlockSender = Timer(true)
     newBlockSender?.scheduleAtFixedRate(object : TimerTask() {
       override fun run() {
-        val txData = TransactionData(Bytes32.random(), counter++)
+        val txData = TransactionData(Bytes32.random())
+        txData.tx = Transaction(UInt256.ONE,
+          Wei.valueOf(2),
+          Gas.valueOf(2),
+          Address.fromBytes(Bytes.random(20)),
+          Wei.valueOf(0L),
+          Bytes.random(64),
+          SECP256K1.KeyPair.random())
         val message = mapper.writeValueAsBytes(txData)
         server?.gossip("", Bytes.wrap(message))
       }
