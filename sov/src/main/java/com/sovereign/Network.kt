@@ -9,6 +9,7 @@ import org.apache.tuweni.crypto.SECP256K1
 import org.apache.tuweni.eth.Address
 import org.apache.tuweni.eth.EthJsonModule
 import org.apache.tuweni.eth.Transaction
+import org.apache.tuweni.eth.repository.BlockchainRepository
 import org.apache.tuweni.plumtree.EphemeralPeerRepository
 import org.apache.tuweni.plumtree.vertx.VertxGossipServer
 import org.apache.tuweni.units.bigints.UInt256
@@ -57,7 +58,12 @@ open class Peer(open val vertx: Vertx, open val name: String, open val port: Int
   }
 }
 
-data class FullNode(override val vertx: Vertx, override val name: String, override val port: Int) :
+data class FullNode(
+  override val vertx: Vertx,
+  override val name: String,
+  override val port: Int,
+  val repository: BlockchainRepository
+) :
   Peer(vertx, name, port) {
 
   override fun newMessage(message: Message) {
@@ -67,7 +73,12 @@ data class FullNode(override val vertx: Vertx, override val name: String, overri
   }
 }
 
-data class LightClient(override val vertx: Vertx, override val name: String, override val port: Int) :
+data class LightClient(
+  override val vertx: Vertx,
+  override val name: String,
+  override val port: Int,
+  val repository: BlockchainRepository
+) :
   Peer(vertx, name, port) {
   override fun newMessage(message: Message) {
     if (message is TransactionData) {
@@ -76,10 +87,14 @@ data class LightClient(override val vertx: Vertx, override val name: String, ove
   }
 }
 
-data class TransactionProducer(override val vertx: Vertx, override val name: String, override val port: Int) :
+data class TransactionProducer(
+  override val vertx: Vertx,
+  override val name: String,
+  override val port: Int,
+  val repository: BlockchainRepository
+) :
   Peer(vertx, name, port) {
 
-  var counter = 0L
   var newBlockSender: Timer? = null
   val mapper = ObjectMapper()
 

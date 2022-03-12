@@ -17,12 +17,18 @@ dependencies {
   implementation project(':concurrent')
   implementation project(':crypto')
   implementation project(':eth')
-  implementation project(':units')
+  implementation project(':genesis')
+  implementation project(':kv')
+  implementation project(':eth-repository')
   implementation project(':plumtree')
+  implementation project(':merkle-trie')
+  implementation project(':units')
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
+  implementation 'org.apache.lucene:lucene-core'
   implementation 'org.bouncycastle:bcprov-jdk15on'
   implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core'
   implementation 'io.vertx:vertx-core'
 
 
