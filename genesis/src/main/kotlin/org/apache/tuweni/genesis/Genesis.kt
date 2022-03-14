@@ -47,7 +47,8 @@ open class GenesisConfig(
  *
  * The block contains the information about the chain, and the initial state of the chain, such as account balances.
  */
-@JsonPropertyOrder("config",
+@JsonPropertyOrder(
+  "config",
   "nonce",
   "timestamp",
   "extraData",
@@ -57,7 +58,8 @@ open class GenesisConfig(
   "gasUsed",
   "mixHash",
   "coinbase",
-  "alloc")
+  "alloc"
+)
 class Genesis(
   val nonce: Bytes,
   val difficulty: UInt256,
@@ -72,8 +74,28 @@ class Genesis(
 ) {
 
   companion object {
+    /**
+     * A hash of a RLP-encoded list, useful to represent blocks with no ommers.
+     */
+    val emptyListHash = Hash.hash(RLP.encodeList { })
+
+    /**
+     * A hash of the RLP encoding of a zero-bytes long bytes array.
+     */
+    val emptyHash = Hash.hash(
+      RLP.encode { writer: RLPWriter ->
+        writer.writeValue(Bytes.EMPTY)
+      }
+    )
+
+    /**
+     * A hash of the RLP encoding of an empty trie
+     */
+    val emptyTrieHash = Hash.hash(RLP.encodeValue(Bytes.EMPTY))
+
     fun dev(
-      genesis: Genesis = Genesis(Bytes.ofUnsignedLong(0),
+      genesis: Genesis = Genesis(
+        Bytes.ofUnsignedLong(0),
         UInt256.ONE,
         Bytes32.ZERO,
         Address.ZERO,
@@ -82,30 +104,29 @@ class Genesis(
         Bytes.EMPTY,
         1_000_000L,
         emptyMap(),
-        GenesisConfig(1337, 0, 0, 0, 0)),
+        GenesisConfig(1337, 0, 0, 0, 0)
+      ),
     ): Block {
-      val emptyListHash = Hash.hash(RLP.encodeList { })
-      val emptyHash = Hash.hash(RLP.encode { writer: RLPWriter ->
-        writer.writeValue(Bytes.EMPTY)
-      })
-      val emptyTrie = Hash.hash(RLP.encodeValue(Bytes.EMPTY))
-      return Block(BlockHeader(
-        Hash.fromBytes(genesis.parentHash),
-        emptyListHash,
-        genesis.coinbase,
-        emptyTrie,
-        emptyHash,
-        emptyHash,
-        Bytes.wrap(ByteArray(256)),
-        genesis.difficulty,
-        UInt256.ZERO,
-        Gas.valueOf(genesis.gasLimit),
-        Gas.valueOf(0L),
-        Instant.ofEpochSecond(genesis.timestamp),
-        genesis.extraData,
-        Hash.fromBytes(genesis.mixHash),
-        UInt64.fromBytes(genesis.nonce)),
-        BlockBody(ArrayList(), ArrayList()))
+      return Block(
+        BlockHeader(
+          Hash.fromBytes(genesis.parentHash),
+          emptyListHash,
+          genesis.coinbase,
+          emptyTrieHash,
+          emptyHash,
+          emptyHash,
+          Bytes.wrap(ByteArray(256)),
+          genesis.difficulty,
+          UInt256.ZERO,
+          Gas.valueOf(genesis.gasLimit),
+          Gas.valueOf(0L),
+          Instant.ofEpochSecond(genesis.timestamp),
+          genesis.extraData,
+          Hash.fromBytes(genesis.mixHash),
+          UInt64.fromBytes(genesis.nonce)
+        ),
+        BlockBody(ArrayList(), ArrayList())
+      )
     }
   }
 
