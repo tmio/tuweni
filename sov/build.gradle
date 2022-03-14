@@ -17,14 +17,18 @@ dependencies {
   implementation project(':concurrent')
   implementation project(':crypto')
   implementation project(':eth')
+  implementation project(':evm')
   implementation project(':genesis')
   implementation project(':kv')
   implementation project(':eth-repository')
   implementation project(':plumtree')
   implementation project(':merkle-trie')
+  implementation project(':rlp')
   implementation project(':units')
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
+  implementation 'io.opentelemetry:opentelemetry-api'
+  implementation 'io.opentelemetry:opentelemetry-api-metrics'
   implementation 'org.apache.lucene:lucene-core'
   implementation 'org.bouncycastle:bcprov-jdk15on'
   implementation 'org.jetbrains.kotlin:kotlin-stdlib'
