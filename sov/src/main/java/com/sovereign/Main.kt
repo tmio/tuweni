@@ -40,17 +40,25 @@ fun main() = runBlocking {
     FullNode(vertx, "full2", 11002, createInitialStateTree(initialBlock))
   )
   val blockProducer =
-    BlockProducer(vertx, "block producer", 10000, createInitialStateTree(initialBlock), listOf(), {
-      Transaction(
-        UInt256.ONE,
-        Wei.valueOf(2),
-        Gas.valueOf(2),
-        Address.fromBytes(Bytes.random(20)),
-        Wei.valueOf(0L),
-        Bytes.random(64),
-        SECP256K1.KeyPair.random()
-      )
-    }, fullNodes)
+    BlockProducer(
+      vertx,
+      "block producer",
+      10000,
+      createInitialStateTree(initialBlock),
+      listOf(createContractDeployTransaction(InitialState.allocations.first().keyPair)),
+      {
+        Transaction(
+          UInt256.ONE,
+          Wei.valueOf(2),
+          Gas.valueOf(2),
+          Address.fromBytes(Bytes.random(20)),
+          Wei.valueOf(0L),
+          Bytes.random(64),
+          SECP256K1.KeyPair.random()
+        )
+      },
+      fullNodes
+    )
   val lightClients = listOf(
     LightClient(vertx, "light1", 12001, createInitialStateTree(initialBlock)),
     LightClient(vertx, "light2", 12002, createInitialStateTree(initialBlock)),

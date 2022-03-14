@@ -41,9 +41,11 @@ import org.apache.tuweni.plumtree.EphemeralPeerRepository
 import org.apache.tuweni.plumtree.vertx.VertxGossipServer
 import org.apache.tuweni.rlp.RLP
 import org.apache.tuweni.trie.MerklePatriciaTrie
+import org.apache.tuweni.trie.MerkleTrie
 import org.apache.tuweni.units.bigints.UInt256
 import org.apache.tuweni.units.bigints.UInt64
 import org.apache.tuweni.units.ethereum.Gas
+import org.apache.tuweni.units.ethereum.Wei
 import java.time.Instant
 import java.util.Timer
 import java.util.TimerTask
@@ -175,60 +177,88 @@ data class BlockProducer(
           for (tx in initialTransactions) {
             val indexKey = RLP.encodeValue(UInt256.valueOf(counter).trimLeadingZeros())
             transactionsTrie.put(indexKey, tx.toBytes())
-            val code = repository.getAccountCode(tx.to!!)
-            val result = vm.execute(
-              tx.sender!!,
-              tx.to!!,
-              tx.value,
-              code!!,
-              tx.payload,
-              genesisBlock.header.gasLimit,
-              tx.gasPrice,
-              Address.ZERO,
-              index,
-              Instant.now().toEpochMilli(),
-              tx.gasLimit.toLong(),
-              genesisBlock.header.difficulty
-            )
-            if (result.statusCode != EVMExecutionStatusCode.SUCCESS) {
-              throw Exception("invalid transaction result")
-            }
-            for (balanceChange in result.changes.getBalanceChanges()) {
-              val state = repository.getAccount(balanceChange.key)?.let {
-                AccountState(it.nonce, balanceChange.value, it.storageRoot, it.codeHash)
-              } ?: repository.newAccountState()
-              repository.storeAccount(balanceChange.key, state)
-            }
-
-            for (storageChange in result.changes.getAccountChanges()) {
-              for (oneStorageChange in storageChange.value) {
-                repository.storeAccountValue(storageChange.key, oneStorageChange.key, oneStorageChange.value)
+            if (null == tx.to) {
+              val contractAddress = Address.fromBytes(
+                Hash.keccak256(
+                  RLP.encodeList {
+                    it.writeValue(tx.sender!!)
+                    it.writeValue(tx.nonce)
+                  }
+                ).slice(12)
+              )
+              val state = AccountState(
+                UInt256.ONE,
+                Wei.valueOf(0),
+                org.apache.tuweni.eth.Hash.fromBytes(MerkleTrie.EMPTY_TRIE_ROOT_HASH),
+                org.apache.tuweni.eth.Hash.hash(tx.payload)
+              )
+              repository.storeAccount(contractAddress, state)
+              repository.storeCode(tx.payload)
+              val receipt = TransactionReceipt(
+                1,
+                0, // TODO
+                LogsBloomFilter(),
+                emptyList()
+              )
+              allReceipts.add(receipt)
+              receiptsTrie.put(indexKey, receipt.toBytes())
+              counter++
+            } else {
+              val code = repository.getAccountCode(tx.to!!)
+              val result = vm.execute(
+                tx.sender!!,
+                tx.to!!,
+                tx.value,
+                code!!,
+                tx.payload,
+                genesisBlock.header.gasLimit,
+                tx.gasPrice,
+                Address.ZERO,
+                index,
+                Instant.now().toEpochMilli(),
+                tx.gasLimit.toLong(),
+                genesisBlock.header.difficulty
+              )
+              if (result.statusCode != EVMExecutionStatusCode.SUCCESS) {
+                throw Exception("invalid transaction result")
               }
-            }
+              for (balanceChange in result.changes.getBalanceChanges()) {
+                val state = repository.getAccount(balanceChange.key)?.let {
+                  AccountState(it.nonce, balanceChange.value, it.storageRoot, it.codeHash)
+                } ?: repository.newAccountState()
+                repository.storeAccount(balanceChange.key, state)
+              }
 
-            for (accountToDestroy in result.changes.accountsToDestroy()) {
-              repository.destroyAccount(accountToDestroy)
-            }
-            for (log in result.changes.getLogs()) {
-              bloomFilter.insertLog(log)
+              for (storageChange in result.changes.getAccountChanges()) {
+                for (oneStorageChange in storageChange.value) {
+                  repository.storeAccountValue(storageChange.key, oneStorageChange.key, oneStorageChange.value)
+                }
+              }
+
+              for (accountToDestroy in result.changes.accountsToDestroy()) {
+                repository.destroyAccount(accountToDestroy)
+              }
+              for (log in result.changes.getLogs()) {
+                bloomFilter.insertLog(log)
+              }
+
+              val txLogsBloomFilter = LogsBloomFilter()
+              for (log in result.changes.getLogs()) {
+                bloomFilter.insertLog(log)
+              }
+              val receipt = TransactionReceipt(
+                1,
+                result.gasManager.gasCost.toLong(),
+                txLogsBloomFilter,
+                result.changes.getLogs()
+              )
+              allReceipts.add(receipt)
+              receiptsTrie.put(indexKey, receipt.toBytes())
+              counter++
+
+              allGasUsed = allGasUsed.add(result.gasManager.gasCost)
             }
             repository.storeTransaction(tx)
-
-            val txLogsBloomFilter = LogsBloomFilter()
-            for (log in result.changes.getLogs()) {
-              bloomFilter.insertLog(log)
-            }
-            val receipt = TransactionReceipt(
-              1,
-              result.gasManager.gasCost.toLong(),
-              txLogsBloomFilter,
-              result.changes.getLogs()
-            )
-            allReceipts.add(receipt)
-            receiptsTrie.put(indexKey, receipt.toBytes())
-            counter++
-
-            allGasUsed = allGasUsed.add(result.gasManager.gasCost)
           }
 
           // create a block from initial transactions, and execute them:
