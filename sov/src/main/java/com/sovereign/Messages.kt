@@ -20,17 +20,57 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import org.apache.tuweni.bytes.Bytes
 import org.apache.tuweni.bytes.Bytes32
-import org.apache.tuweni.eth.BlockHeader
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
-@JsonSubTypes(JsonSubTypes.Type(value = StateRootData::class, name = "StateRoot"))
+@JsonSubTypes(JsonSubTypes.Type(value = StateRootData::class, name = "StateRoot"),
+  JsonSubTypes.Type(value = StartChallenge::class, name = "StartChallenge"),
+  JsonSubTypes.Type(value = BisectRequest::class, name = "BisectRequest"),
+  JsonSubTypes.Type(value = BisectResponse::class, name = "BisectResponse"),
+  JsonSubTypes.Type(value = ChallengeAccepted::class, name = "ChallengeAccepted"),
+  JsonSubTypes.Type(value = AskForChallenger::class, name = "AskForChallenger"),
+)
 interface Message
 
 class StateRootData : Message {
 
+  @JsonProperty("root")
+  var root: Bytes32? = null
+}
+
+class StartChallenge : Message {
+
+  @JsonProperty("root")
+  var root: Bytes32? = null
+}
+
+class ChallengeAccepted : Message {
+
+  @JsonProperty("root")
+  var root: Bytes32? = null
+}
+
+class BisectRequest: Message {
+  @JsonProperty("root")
+  var root: Bytes32? = null
+
+  @JsonProperty("numInstructions")
+  var numInstructions: Int = 0
+}
+
+class BisectResponse : Message {
+  @JsonProperty("numInstructions")
+  var numInstructions: Int = 0
+
+  @JsonProperty("vmHash")
+  var vmHash: Bytes32? = null
+
+  @JsonProperty("complete")
+  var complete: Boolean = false
+}
+
+class AskForChallenger : Message {
   @JsonProperty("root")
   var root: Bytes32? = null
 }

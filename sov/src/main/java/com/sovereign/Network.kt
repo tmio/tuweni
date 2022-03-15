@@ -38,6 +38,7 @@ import org.apache.tuweni.evm.EthereumVirtualMachine
 import org.apache.tuweni.evm.impl.EvmVmImpl
 import org.apache.tuweni.genesis.Genesis
 import org.apache.tuweni.plumtree.EphemeralPeerRepository
+import org.apache.tuweni.plumtree.Peer
 import org.apache.tuweni.plumtree.vertx.VertxGossipServer
 import org.apache.tuweni.rlp.RLP
 import org.apache.tuweni.trie.MerklePatriciaTrie
@@ -50,21 +51,21 @@ import java.time.Instant
 import java.util.Timer
 import java.util.TimerTask
 
-open class Peer(open val vertx: Vertx, open val name: String, open val port: Int) {
-  protected var server: VertxGossipServer? = null
+open class Node(open val vertx: Vertx, open val name: String, open val port: Int) {
+  var server: VertxGossipServer? = null
 
-  private val mapper = ObjectMapper()
+  protected val mapper = ObjectMapper()
 
   init {
     mapper.registerModule(EthJsonModule())
   }
 
-  open fun newMessage(message: Message) {
+  open fun newMessage(message: Message, peer: Peer) {
   }
 
-  private fun deserializeAndHandle(messageBody: Bytes, @Suppress("UNUSED_PARAMETER") attributes: String) {
+  private fun deserializeAndHandle(messageBody: Bytes, @Suppress("UNUSED_PARAMETER") attributes: String, peer : Peer) {
     val message: Message = mapper.readerFor(Message::class.java).readValue(messageBody.toArrayUnsafe())
-    newMessage(message)
+    newMessage(message, peer)
   }
 
   open fun start() {
@@ -98,33 +99,46 @@ data class FullNode(
   override val port: Int,
   val repository: BlockchainRepository,
 ) :
-  Peer(vertx, name, port) {
+  Node(vertx, name, port) {
 
   var blocks = mutableListOf<Block>()
 
-  override fun newMessage(message: Message) {
+  override fun newMessage(message: Message, peer: Peer) {
     if (message is StateRootData) {
       val last = blocks.last()
       println("$name-${message.root}-${last.header.stateRoot.equals(message.root)}")
+    } else if (message is AskForChallenger) {
+      server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(ChallengeAccepted())))
+    } else if (message is ChallengeAccepted) {
+      val stateRoot = message.root
+      val vmHash = executeBisection(stateRoot, 8)
+      val bisectResponse = BisectResponse()
+      bisectResponse.complete = true
+
+      bisectResponse.vmHash = vmHash
+      bisectResponse.numInstructions = 0
+      server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(bisectResponse)))
+    } else if (message is BisectRequest) {
+      val vmHash = executeBisection(message.root, message.numInstructions)
+      val bisectResponse = BisectResponse()
+      bisectResponse.complete = true
+
+      bisectResponse.vmHash = vmHash
+      bisectResponse.numInstructions = 0
+      server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(bisectResponse)))
+    } else {
+      println("Unexpected message ${message}")
     }
+  }
+
+  private fun executeBisection(stateRoot: Bytes32?, numExecutions: Int): Bytes32? {
+    println("Being asked to execute a bisection with stateRoot $stateRoot for $numExecutions")
+    // TODO actually execute the EVM !!!
+    return Bytes32.random()
   }
 
   fun receiveBlock(block: Block) {
     blocks.add(block)
-  }
-}
-
-data class LightClient(
-  override val vertx: Vertx,
-  override val name: String,
-  override val port: Int,
-  val repository: BlockchainRepository,
-) :
-  Peer(vertx, name, port) {
-  override fun newMessage(message: Message) {
-    if (message is StateRootData) {
-      println("$name-${message.root}")
-    }
   }
 }
 
@@ -137,14 +151,12 @@ data class BlockProducer(
   val ongoingTransactions: () -> Transaction,
   val fullNodes: List<FullNode>,
 ) :
-  Peer(vertx, name, port) {
+  Node(vertx, name, port) {
 
   var newBlockSender: Timer? = null
-  val mapper = ObjectMapper()
   val vm = EthereumVirtualMachine(repository, EvmVmImpl::create)
 
   init {
-    mapper.registerModule(EthJsonModule())
     runBlocking {
       vm.start()
     }
