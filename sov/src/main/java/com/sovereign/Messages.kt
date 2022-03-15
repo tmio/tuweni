@@ -21,24 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.apache.tuweni.bytes.Bytes
+import org.apache.tuweni.bytes.Bytes32
 import org.apache.tuweni.eth.BlockHeader
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
-@JsonSubTypes(JsonSubTypes.Type(value = BlockHeaderData::class, name = "BlockHeader"))
+@JsonSubTypes(JsonSubTypes.Type(value = StateRootData::class, name = "StateRoot"))
 interface Message
 
-class BlockHeaderData : Message {
+class StateRootData : Message {
 
-  var header: BlockHeader? = null
-
-  @JsonProperty("header")
-  fun header(data: Bytes) {
-    header = BlockHeader.fromBytes(data)
-  }
-
-  @JsonProperty("header")
-  fun header(): Bytes {
-    return header!!.toBytes()
-  }
+  @JsonProperty("root")
+  var root: Bytes32? = null
 }

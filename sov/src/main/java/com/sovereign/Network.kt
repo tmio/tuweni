@@ -103,9 +103,9 @@ data class FullNode(
   var blocks = mutableListOf<Block>()
 
   override fun newMessage(message: Message) {
-    if (message is BlockHeaderData) {
+    if (message is StateRootData) {
       val last = blocks.last()
-      println("$name-${message.header!!.hash}-${last.header.hash.equals(message.header!!.hash)}")
+      println("$name-${message.root}-${last.header.stateRoot.equals(message.root)}")
     }
   }
 
@@ -122,8 +122,8 @@ data class LightClient(
 ) :
   Peer(vertx, name, port) {
   override fun newMessage(message: Message) {
-    if (message is BlockHeaderData) {
-      println("$name-${message.header!!.hash}")
+    if (message is StateRootData) {
+      println("$name-${message.root}")
     }
   }
 }
@@ -292,10 +292,10 @@ data class BlockProducer(
           repository.storeBlock(block)
           // send to all the nodes
           sendToFullNodes(block)
-          // wait a second before propagating the header
+          // wait a second before propagating the state root
           delay(1000)
-          val data = BlockHeaderData()
-          data.header = block.header
+          val data = StateRootData()
+          data.root = block.header.stateRoot
           val message = mapper.writeValueAsBytes(data)
           server?.gossip("", Bytes.wrap(message))
           Unit
