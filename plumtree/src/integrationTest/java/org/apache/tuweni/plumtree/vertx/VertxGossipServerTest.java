@@ -23,6 +23,7 @@ import org.apache.tuweni.plumtree.EphemeralPeerRepository;
 import org.apache.tuweni.plumtree.MessageListener;
 
 import io.vertx.core.Vertx;
+import org.apache.tuweni.plumtree.Peer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -34,7 +35,7 @@ class VertxGossipServerTest {
     public Bytes message;
 
     @Override
-    public void listen(Bytes messageBody, String attributes) {
+    public void listen(Bytes messageBody, String attributes, Peer peer) {
       message = messageBody;
     }
   }
