@@ -118,12 +118,14 @@ class EvmVmImpl(val stepListener: StepListener? = null) : EvmVm {
       }
       stepListener?.halt(executionPath)?.let {
         if (it) {
-          return EVMResult(EVMExecutionStatusCode.HALTED,
+          return EVMResult(
+            EVMExecutionStatusCode.HALTED,
             gasManager,
             hostContext,
             hostContext as TransactionalEVMHostContext,
             stack,
-            memory)
+            memory
+          )
         }
       }
     }

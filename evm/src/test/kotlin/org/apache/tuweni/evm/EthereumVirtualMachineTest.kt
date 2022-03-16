@@ -207,7 +207,6 @@ class EthereumVirtualMachineTest {
         }
         return false
       }
-
     }
     val result = runCode(writer, Bytes.fromHexString("0x30600052596000f3"), { EvmVmImpl.create(listener) })
     assertEquals(EVMExecutionStatusCode.HALTED, result.statusCode)
@@ -223,10 +222,27 @@ class EthereumVirtualMachineTest {
         }
         return false
       }
-
     }
     val result = runCode(writer, Bytes.fromHexString("0x30600052596000f3"), { EvmVmImpl.create(listener) })
     assertEquals(EVMExecutionStatusCode.SUCCESS, result.statusCode)
     assertEquals(Gas.valueOf(199984), result.gasManager.gasLeft())
+  }
+
+  @Test
+  fun testDump(@LuceneIndexWriter writer: IndexWriter) {
+    val listener = object : StepListener {
+      override fun halt(executionPath: List<Byte>): Boolean {
+        if (executionPath.size > 3) {
+          return true
+        }
+        return false
+      }
+    }
+    val result = runCode(writer, Bytes.fromHexString("0x30600052596000f3"), { EvmVmImpl.create(listener) })
+    assertEquals(EVMExecutionStatusCode.HALTED, result.statusCode)
+    assertEquals(
+      Bytes.fromHexString("0xf85c866d656d6f7279a0000000000000000000000000353363663737323034654565663935326532350085737461636ba00000000000000000000000000000000000000000000000000000000000000020866f757470757480846c6f6773"),
+      result.dumpStateToBytes()
+    )
   }
 }
