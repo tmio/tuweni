@@ -63,7 +63,7 @@ open class Node(open val vertx: Vertx, open val name: String, open val port: Int
   open fun newMessage(message: Message, peer: Peer) {
   }
 
-  private fun deserializeAndHandle(messageBody: Bytes, @Suppress("UNUSED_PARAMETER") attributes: String, peer : Peer) {
+  private fun deserializeAndHandle(messageBody: Bytes, @Suppress("UNUSED_PARAMETER") attributes: String, peer: Peer) {
     val message: Message = mapper.readerFor(Message::class.java).readValue(messageBody.toArrayUnsafe())
     newMessage(message, peer)
   }
@@ -127,7 +127,7 @@ data class FullNode(
       bisectResponse.numInstructions = 0
       server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(bisectResponse)))
     } else {
-      println("Unexpected message ${message}")
+      println("Unexpected message $message")
     }
   }
 

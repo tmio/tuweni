@@ -24,7 +24,8 @@ import org.apache.tuweni.bytes.Bytes32
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
-@JsonSubTypes(JsonSubTypes.Type(value = StateRootData::class, name = "StateRoot"),
+@JsonSubTypes(
+  JsonSubTypes.Type(value = StateRootData::class, name = "StateRoot"),
   JsonSubTypes.Type(value = StartChallenge::class, name = "StartChallenge"),
   JsonSubTypes.Type(value = BisectRequest::class, name = "BisectRequest"),
   JsonSubTypes.Type(value = BisectResponse::class, name = "BisectResponse"),
@@ -51,7 +52,7 @@ class ChallengeAccepted : Message {
   var root: Bytes32? = null
 }
 
-class BisectRequest: Message {
+class BisectRequest : Message {
   @JsonProperty("root")
   var root: Bytes32? = null
 
