@@ -161,6 +161,15 @@ data class BlockProducer(
           val protoBlock = processor.execute(genesisBlock, initialTransactions, repository)
           val block = protoBlock.toBlock(listOf(), Address.ZERO, UInt256.ONE, Instant.now(), Bytes.EMPTY, Genesis.emptyHash, UInt64.random())
 
+          protoBlock.stateChanges.applyChanges()
+          for (i in 0 until protoBlock.transactionReceipts.size) {
+            val tx = protoBlock.body.transactions[i]
+            repository.storeTransaction(tx)
+            val txReceipt = protoBlock.transactionReceipts[i]
+            repository.storeTransactionReceipt(txReceipt, i, tx.hash, block.header.hash)
+          }
+          repository.storeBlock(block)
+
           // send to all the nodes
           sendToFullNodes(block)
           // wait a second before propagating the state root
