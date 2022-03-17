@@ -29,8 +29,6 @@ import org.apache.tuweni.eth.Block
 import org.apache.tuweni.eth.EthJsonModule
 import org.apache.tuweni.eth.Transaction
 import org.apache.tuweni.eth.repository.BlockchainRepository
-import org.apache.tuweni.evm.EthereumVirtualMachine
-import org.apache.tuweni.evm.impl.EvmVmImpl
 import org.apache.tuweni.genesis.Genesis
 import org.apache.tuweni.plumtree.EphemeralPeerRepository
 import org.apache.tuweni.plumtree.Peer
@@ -144,14 +142,6 @@ data class BlockProducer(
   Node(vertx, name, port) {
 
   var newBlockSender: Timer? = null
-  val vm = EthereumVirtualMachine(repository, EvmVmImpl::create)
-
-  init {
-    runBlocking {
-      vm.start()
-    }
-  }
-
   fun sendToFullNodes(block: Block) {
     for (fullNode in fullNodes) {
       fullNode.receiveBlock(block)
@@ -170,6 +160,7 @@ data class BlockProducer(
           val processor = BlockProcessor()
           val protoBlock = processor.execute(genesisBlock, initialTransactions, repository)
           val block = protoBlock.toBlock(listOf(), Address.ZERO, UInt256.ONE, Instant.now(), Bytes.EMPTY, Genesis.emptyHash, UInt64.random())
+
           // send to all the nodes
           sendToFullNodes(block)
           // wait a second before propagating the state root
