@@ -81,55 +81,6 @@ open class Node(open val vertx: Vertx, open val name: String, open val port: Int
   }
 }
 
-data class FullNode(
-  override val vertx: Vertx,
-  override val name: String,
-  override val port: Int,
-  val repository: BlockchainRepository,
-) :
-  Node(vertx, name, port) {
-
-  var blocks = mutableListOf<Block>()
-
-  override fun newMessage(message: Message, peer: Peer) {
-    if (message is StateRootData) {
-      val last = blocks.last()
-      println("$name-${message.root}-${last.header.stateRoot.equals(message.root)}")
-    } else if (message is AskForChallenger) {
-      server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(ChallengeAccepted())))
-    } else if (message is ChallengeAccepted) {
-      val stateRoot = message.root
-      val vmHash = executeBisection(stateRoot, 8)
-      val bisectResponse = BisectResponse()
-      bisectResponse.complete = true
-
-      bisectResponse.vmHash = vmHash
-      bisectResponse.numInstructions = 0
-      server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(bisectResponse)))
-    } else if (message is BisectRequest) {
-      val vmHash = executeBisection(message.root, message.numInstructions)
-      val bisectResponse = BisectResponse()
-      bisectResponse.complete = true
-
-      bisectResponse.vmHash = vmHash
-      bisectResponse.numInstructions = 0
-      server!!.send(peer, "", Bytes.wrap(mapper.writeValueAsBytes(bisectResponse)))
-    } else {
-      println("Unexpected message $message")
-    }
-  }
-
-  private fun executeBisection(stateRoot: Bytes32?, numExecutions: Int): Bytes32? {
-    println("Being asked to execute a bisection with stateRoot $stateRoot for $numExecutions")
-    // TODO actually execute the EVM !!!
-    return Bytes32.random()
-  }
-
-  fun receiveBlock(block: Block) {
-    blocks.add(block)
-  }
-}
-
 data class BlockProducer(
   override val vertx: Vertx,
   override val name: String,
