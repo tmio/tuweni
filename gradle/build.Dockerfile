@@ -51,7 +51,7 @@ RUN apt-get update \
     && which hg \
     && which svn
 
-ENV GRADLE_VERSION 7.3
+ENV GRADLE_VERSION 7.6
 ARG GRADLE_DOWNLOAD_SHA256=de8f52ad49bdc759164f72439a3bf56ddb1589c4cde802d3cec7d6ad0e0ee410
 RUN set -o errexit -o nounset \
     && echo "Downloading Gradle" \
