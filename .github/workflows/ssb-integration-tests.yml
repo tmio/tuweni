@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-name: integration tests
+name: ssb integration tests
 
 on:
   push:
@@ -27,6 +27,18 @@ jobs:
   integration-tests:
     timeout-minutes: 30
     runs-on: [self-hosted, Linux]
+    services:
+      ssb:
+        image: tmio/ssb-server-docker:latest
+        ports:
+          - 8008:8008
+          - 7777:7777
+        volumes:
+          - /tmp/ssb:/root/.ssb
+    env:
+      ssb_host: ssb
+      ssb_port: 8008
+      ssb_dir: /tmp/ssb
     container:
       image: tmio/tuweni-build:1.2
       volumes:
@@ -48,7 +60,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/dependency-versions.gradle') }}
           restore-keys: ${{ runner.os }}-m2
       - name: gradle integrationTest
-        run: gradle devp2p-eth:integrationTest devp2p-proxy:integrationTest devp2p:integrationTest dist:integrationTest dns-discovery:integrationTest eth-client-ui:integrationTest eth-client:integrationTest ethstats:integrationTest gossip:integrationTest hobbits-relayer:integrationTest hobbits:integrationTest plumtree-servlet:integrationTest plumtree-vertx:integrationTest rlpx:integrationTest
+        run: gradle scuttlebutt-client-lib:integrationTest scuttlebutt-discovery:integrationTest scuttlebutt-handshake:integrationTest scuttlebutt-rpc:integrationTest
       - name: Archive Junit Report
         if: always()
         uses: actions/upload-artifact@v3
