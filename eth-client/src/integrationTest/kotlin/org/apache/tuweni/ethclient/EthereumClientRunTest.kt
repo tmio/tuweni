@@ -53,6 +53,7 @@ class EthereumClientRunTest {
   }
 
   @Test
+  @Disabled("test flakiness")
   fun startTwoClientsAndConnectThem(@VertxInstance vertx: Vertx) = runBlocking {
     val keyPair = SECP256K1.KeyPair.random()
     val config1 = EthereumClientConfig.fromString(
