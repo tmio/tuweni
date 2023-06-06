@@ -22,6 +22,12 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    paths:
+      - 'scuttlebutt/**'
+      - 'scuttlebutt-client-lib/**'
+      - 'scuttlebutt-discovery/**'
+      - 'scuttlebutt-handshake/**'
+      - 'scuttlebutt-rpc/**'
 
 jobs:
   integration-tests:
