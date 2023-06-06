@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.RuntimeException
+import java.util.concurrent.atomic.AtomicInteger
 
 private val NOOP_EXCEPTION_HANDLER = CoroutineExceptionHandler { _, _ -> }
 
@@ -32,12 +33,13 @@ internal class RetryableTest {
   @Test
   fun shouldRetryUntilSuccess() = runBlocking {
     var attempts = 0
-    val result = retry(100) { i ->
+    val countAttempts = AtomicInteger(5)
+    val result = retry(100) {
       attempts++
-      delay(470)
-      "done $i"
+      val current = countAttempts.decrementAndGet()
+      if (current == 0) "done" else null
     }
-    assertEquals("done 1", result)
+    assertEquals("done", result)
     assertEquals(5, attempts)
   }
 
