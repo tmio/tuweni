@@ -35,18 +35,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-      - name: Cache Maven Repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/dependency-versions.gradle') }}
-          restore-keys: ${{ runner.os }}-m2
+          distribution: temurin
+          java-version: 17
+          cache: gradle
       - name: gradle integrationTest
         run: gradle devp2p-eth:integrationTest devp2p-proxy:integrationTest devp2p:integrationTest dist:integrationTest dns-discovery:integrationTest eth-client-ui:integrationTest eth-client:integrationTest ethstats:integrationTest gossip:integrationTest hobbits-relayer:integrationTest hobbits:integrationTest plumtree-servlet:integrationTest plumtree-vertx:integrationTest rlpx:integrationTest
       - name: Archive Junit Report

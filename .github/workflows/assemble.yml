@@ -35,24 +35,12 @@ jobs:
           submodules: true
       - name: Set up GPG key
         run: gpg --import gradle/tuweni-test.asc
-      - name: Cache Licenses
-        uses: actions/cache@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          path: reports/license/license-dependency.xml
-          key: licenses-${{ hashFiles('**/reports/license/license-dependency.xml') }}
-          restore-keys: license-dependency.xml
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-      - name: Cache Maven Repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/dependency-versions.gradle') }}
-          restore-keys: ${{ runner.os }}-m2
+          distribution: temurin
+          java-version: 17
+          cache: gradle
       - name: gradle assemble
         run: gradle assemble -x test -Psignatory.keyId=38F6C7215DD49C32 -Psigning.gnupg.keyName=38F6C7215DD49C32 -Psigning.gnupg.executable=gpg
         env:
@@ -88,6 +76,7 @@ jobs:
         with:
           java-version: 17
           distribution: temurin
+          cache: gradle
       - name: Build from source
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: cd distunzipped/tuweni && ./gradlew assemble
