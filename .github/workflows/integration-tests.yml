@@ -42,7 +42,7 @@ jobs:
           java-version: 17
           cache: gradle
       - name: gradle integrationTest
-        run: gradle devp2p-eth:integrationTest devp2p-proxy:integrationTest devp2p:integrationTest dist:integrationTest dns-discovery:integrationTest eth-client-ui:integrationTest eth-client:integrationTest ethstats:integrationTest gossip:integrationTest hobbits-relayer:integrationTest hobbits:integrationTest plumtree-servlet:integrationTest plumtree-vertx:integrationTest rlpx:integrationTest
+        run: gradle compileJava compileKotlin compileIntegrationTestJava compileIntegrationTestKotlin devp2p-eth:integrationTest devp2p-proxy:integrationTest devp2p:integrationTest dist:integrationTest dns-discovery:integrationTest eth-client-ui:integrationTest eth-client:integrationTest ethstats:integrationTest gossip:integrationTest hobbits-relayer:integrationTest hobbits:integrationTest plumtree-servlet:integrationTest plumtree-vertx:integrationTest rlpx:integrationTest
       - name: Archive Junit Report
         if: always()
         uses: actions/upload-artifact@v3
