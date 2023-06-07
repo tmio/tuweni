@@ -25,7 +25,7 @@ class WalletTest {
     @JvmStatic
     @BeforeAll
     fun setup() {
-      Assumptions.assumeTrue(Sodium.isAvailable(), "Sodium native library is not available");
+      Assumptions.assumeTrue(Sodium.isAvailable(), "Sodium native library is not available")
     }
   }
 
