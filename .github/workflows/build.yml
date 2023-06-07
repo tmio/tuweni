@@ -107,7 +107,7 @@ jobs:
         run: unzip -q -o - tuweni-src-*.zip -d distunzipped
       - name: Unzip source
         if: ${{ matrix.os == 'Windows' }}
-        run: Expand-Archive tuweni-src-*.zip distunzipped
+        run: Expand-Archive -Force -Path tuweni-src-*.zip -DestinationPath distunzipped
       - name: Rename folder
         run: mv distunzipped/tuweni-src-* distunzipped/tuweni
       - name: Set up JDK 17
