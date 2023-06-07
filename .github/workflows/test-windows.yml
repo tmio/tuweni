@@ -21,12 +21,14 @@ on:
   push:
     branches: [ main ]
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches: [ main ]
 
 jobs:
   test-windows:
     timeout-minutes: 30
-    runs-on: windows-latest
+    runs-on: [self-hosted, Windows]
+    if: ${{ github.actor != 'dependabot[bot]' && (contains(github.event.pull_request.labels.*.name, 'Run Windows') || github.event_name == 'push') }}
     steps:
       - uses: actions/checkout@v3
         with:

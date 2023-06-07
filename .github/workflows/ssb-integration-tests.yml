@@ -59,8 +59,13 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: gradle
+      - name: Cache classes
+        uses: actions/cache@v3
+        with:
+          path: "**/*.class"
+          key: ${{ runner.os }}-build-${{ github.sha }}
       - name: gradle integrationTest
-        run: gradle compileJava compileKotlin compileIntegrationTestJava compileIntegrationTestKotlin scuttlebutt-client-lib:integrationTest scuttlebutt-discovery:integrationTest scuttlebutt-handshake:integrationTest scuttlebutt-rpc:integrationTest
+        run: gradle scuttlebutt-client-lib:integrationTest scuttlebutt-discovery:integrationTest scuttlebutt-handshake:integrationTest scuttlebutt-rpc:integrationTest
       - name: Archive Junit Report
         if: always()
         uses: actions/upload-artifact@v3
