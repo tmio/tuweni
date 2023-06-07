@@ -37,8 +37,8 @@ class GossipIntegrationTest {
       throws Exception {
     GossipCommandLineOptions opts1 =
         new GossipCommandLineOptions(
-            new String[] {"tcp://127.0.0.1:9001", "tcp://127.0.0.1:9002"},
-            9000,
+            new String[] {"tcp://127.0.0.1:19001", "tcp://127.0.0.1:19002"},
+            19000,
             "127.0.0.1",
             tempDir.resolve("log1.log").toString(),
             10000,
@@ -49,8 +49,8 @@ class GossipIntegrationTest {
             null);
     GossipCommandLineOptions opts2 =
         new GossipCommandLineOptions(
-            new String[] {"tcp://127.0.0.1:9000", "tcp://127.0.0.1:9002"},
-            9001,
+            new String[] {"tcp://127.0.0.1:19000", "tcp://127.0.0.1:19002"},
+            19001,
             "127.0.0.1",
             tempDir.resolve("log2.log").toString(),
             10001,
@@ -61,8 +61,8 @@ class GossipIntegrationTest {
             null);
     GossipCommandLineOptions opts3 =
         new GossipCommandLineOptions(
-            new String[] {"tcp://127.0.0.1:9000", "tcp://127.0.0.1:9001"},
-            9002,
+            new String[] {"tcp://127.0.0.1:19000", "tcp://127.0.0.1:19001"},
+            19002,
             "127.0.0.1",
             tempDir.resolve("log3.log").toString(),
             10002,

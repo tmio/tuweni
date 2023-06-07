@@ -15,39 +15,57 @@
 # limitations under the License.
 #
 
-name: reference tests
+name: ssb integration tests
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    paths:
+      - 'scuttlebutt/**'
+      - 'scuttlebutt-client-lib/**'
+      - 'scuttlebutt-discovery/**'
+      - 'scuttlebutt-handshake/**'
+      - 'scuttlebutt-rpc/**'
 
 jobs:
-  test:
+  integration-tests:
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
+    services:
+      ssb:
+        image: tmio/ssb-server-docker:latest
+        ports:
+          - 8008:8008
+          - 7777:7777
+        volumes:
+          - /tmp/ssb:/root/.ssb
+    env:
+      ssb_host: ssb
+      ssb_port: 8008
+      ssb_dir: /tmp/ssb
     container:
       image: tmio/tuweni-build:1.2
-      options: --user 1001
+      volumes:
+        - /tmp/ssb:/tmp/ssb
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Cache Gradle packages
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - name: Cache classes
         uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-      - name: Cache Maven Repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/dependency-versions.gradle') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: gradle evm:referenceTest
-        run: gradle evm:referenceTest
+          path: "**/*.class"
+          key: ${{ runner.os }}-build-${{ github.sha }}
+      - name: gradle integrationTest
+        run: gradle scuttlebutt-client-lib:integrationTest scuttlebutt-discovery:integrationTest scuttlebutt-handshake:integrationTest scuttlebutt-rpc:integrationTest
       - name: Archive Junit Report
         if: always()
         uses: actions/upload-artifact@v3

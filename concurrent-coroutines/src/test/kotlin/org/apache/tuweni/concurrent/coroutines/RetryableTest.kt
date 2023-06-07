@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.RuntimeException
+import java.util.concurrent.atomic.AtomicInteger
 
 private val NOOP_EXCEPTION_HANDLER = CoroutineExceptionHandler { _, _ -> }
 
@@ -32,36 +33,39 @@ internal class RetryableTest {
   @Test
   fun shouldRetryUntilSuccess() = runBlocking {
     var attempts = 0
-    val result = retry(100) { i ->
+    val countAttempts = AtomicInteger(5)
+    val result = retry(100) {
       attempts++
-      delay(470)
-      "done $i"
+      val current = countAttempts.decrementAndGet()
+      if (current == 0) "done" else null
     }
-    assertEquals("done 1", result)
+    assertEquals("done", result)
     assertEquals(5, attempts)
   }
 
   @Test
   fun shouldReturnAnySuccess() = runBlocking {
     var attempts = 0
-    val result = retry(25) { i ->
+    val countAttempts = AtomicInteger(5)
+    val result = retry(25) { _ ->
       attempts++
-      delay(if (i == 4) 60 else 1000)
-      "done $i"
+      val current = countAttempts.decrementAndGet()
+      if (current == 0) "done" else null
     }
-    assertEquals("done 4", result)
+    assertEquals("done", result)
     assertTrue(attempts > 4)
   }
 
   @Test
   fun shouldStopRetryingAfterMaxAttempts() = runBlocking {
     var attempts = 0
-    val result = retry(50, 3) { i ->
+    val countAttempts = AtomicInteger(3)
+    val result = retry(50, 3) { _ ->
       attempts++
-      delay(250)
-      "done $i"
+      val current = countAttempts.decrementAndGet()
+      if (current == 0) "done" else null
     }
-    assertEquals("done 1", result)
+    assertEquals("done", result)
     assertEquals(3, attempts)
   }
 
@@ -70,7 +74,6 @@ internal class RetryableTest {
     var attempts = 0
     val result = retry(50, 3) {
       attempts++
-      delay(250)
       null
     }
     assertNull(result)

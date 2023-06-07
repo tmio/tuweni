@@ -31,7 +31,11 @@ jobs:
       image: tmio/tuweni-build:1.2
     steps:
       - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          submodules: true
-      - name: gradle rat spotlessCheck checkNotice
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - name: gradle spotlessCheck checkNotice
         run: gradle spotlessCheck checkNotice
