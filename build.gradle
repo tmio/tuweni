@@ -35,7 +35,6 @@ plugins {
   id 'org.jetbrains.kotlin.plugin.spring' version '1.9.0-Beta'
   id 'org.jetbrains.dokka' version '1.8.10'
   id 'maven-publish'
-  id 'com.jfrog.bintray' version '1.8.5'
   id 'se.patrikerdes.use-latest-versions' version '0.2.18'
   id 'com.github.ben-manes.versions' version '0.46.0'
 }
@@ -184,7 +183,6 @@ allprojects {
   apply plugin: 'io.spring.dependency-management'
   apply plugin: 'jacoco'
   apply plugin: 'org.jetbrains.dokka'
-  apply plugin: 'com.jfrog.bintray'
   apply plugin: 'net.ltgt.errorprone'
   apply plugin: 'maven-publish'
   apply plugin: 'signing'
@@ -501,19 +499,6 @@ allprojects {
         destination = file("$buildDir/generated-pom.xml")
       }
       tasks.publishMavenDeploymentPublicationToMavenLocal { dependsOn project.tasks.signArchives }
-    }
-
-    bintray {
-      publications = ['MavenDeployment']
-      user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : 'invalid'
-      key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : 'invalid'
-      pkg {
-        repo = project.hasProperty('bintrayRepo') ? project.property('bintrayRepo') : 'invalid'
-        name = project.hasProperty('bintrayName') ? project.property('bintrayName') : 'invalid'
-        userOrg = project.hasProperty('bintrayOrg') ? project.property('bintrayOrg') : 'invalid'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/tmio/incubator-tuweni.git'
-      }
     }
   }
 }
