@@ -6,12 +6,15 @@ import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.apache.tuweni.crypto.SECP256K1;
 import org.apache.tuweni.units.bigints.UInt256;
+import org.apache.tuweni.units.bigints.UInt64;
 import org.apache.tuweni.units.ethereum.Gas;
 import org.apache.tuweni.units.ethereum.Wei;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +24,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.jetbrains.annotations.Nullable;
 
 public class EthJsonModule extends SimpleModule {
 
@@ -125,6 +129,107 @@ public class EthJsonModule extends SimpleModule {
         throws IOException {
       gen.writeString(value.toBytes().toHexString());
     }
+  }
+
+  static class JsonBlock {
+    public String difficulty;
+    public String extraData;
+    public String gasLimit;
+    public String gasUsed;
+    public String hash;
+    public String logsBloom;
+    public String miner;
+    public String mixHash;
+    public String nonce;
+    public String number;
+    public String parentHash;
+    public String receiptsRoot;
+    public String sha3Uncles;
+    public String size;
+    public String stateRoot;
+    public String timestamp;
+    public String totalDifficulty;
+    public String transactionsRoot;
+    public List<Transaction> transactions;
+    public List<Hash> uncles;
+  }
+
+  static class BlockDeserializer extends StdDeserializer<Block> {
+
+    BlockDeserializer() {
+      super(Block.class);
+    }
+
+    @Override
+    public Block deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException, JacksonException {
+      JsonBlock jb = p.readValueAs(JsonBlock.class);
+      BlockHeader header =
+          new BlockHeader(
+              Hash.fromHexString(jb.parentHash),
+              Hash.fromHexString(jb.sha3Uncles),
+              Address.fromHexString(jb.miner),
+              Hash.fromHexString(jb.stateRoot),
+              Hash.fromHexString(jb.transactionsRoot),
+              Hash.fromHexString(jb.receiptsRoot),
+              Bytes.fromHexString(jb.receiptsRoot),
+              UInt256.fromHexString(jb.difficulty),
+              UInt256.fromHexString(jb.number),
+              Gas.valueOf(UInt256.fromHexString(jb.gasLimit)),
+              Gas.valueOf(UInt256.fromHexString(jb.gasUsed)),
+              Instant.ofEpochSecond(UInt256.fromHexString(jb.timestamp).toLong()),
+              Bytes.fromHexString(jb.extraData),
+              Hash.fromHexString(jb.mixHash),
+              UInt64.fromHexString(jb.nonce));
+
+      BlockBody body = new BlockBody(jb.transactions, jb.uncles, null);
+      return new Block(header, body);
+    }
+  }
+
+  static class JsonTransaction {
+    public UInt256 difficulty;
+    public Bytes32 extraData;
+    public Gas gas;
+    public Wei gasPrice;
+    public Hash hash;
+    public UInt256 nonce;
+    public Address to;
+    public Wei value;
+    public Bytes logsBloom;
+    public Integer chainId;
+    public Bytes input;
+    public Hash blockHash;
+    public UInt256 blockNumber;
+    public Address from;
+    public UInt256 r;
+    public UInt256 s;
+    public UInt256 v;
+    public UInt256 transactionIndex;
+    public String type;
+  }
+
+  static class TransactionDeserializer extends StdDeserializer<Transaction> {
+
+    TransactionDeserializer() {
+      super(Transaction.class);
+    }
+
+    @Override
+    public Transaction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+      JsonTransaction jt = p.readValueAs(JsonTransaction.class);
+      SECP256K1.Signature signature = SECP256K1.Signature.create(jt.v.get(0), jt.r.toUnsignedBigInteger(), jt.s.toUnsignedBigInteger());
+
+      return new Transaction(jt.nonce,
+              jt.gasPrice,
+              jt.gas,
+              jt.to,
+              jt.value,
+              jt.input,
+              jt.chainId,
+              signature);
+    }
+
   }
 
   static class UInt256Serializer extends StdSerializer<UInt256> {
@@ -316,5 +421,7 @@ public class EthJsonModule extends SimpleModule {
     addSerializer(SECP256K1.PublicKey.class, new PublicKeySerializer());
     addSerializer(StringOrLong.class, new StringOrLongSerializer());
     addDeserializer(StringOrLong.class, new StringOrLongDeserializer());
+    addDeserializer(Block.class, new BlockDeserializer());
+    addDeserializer(Transaction.class, new TransactionDeserializer());
   }
 }

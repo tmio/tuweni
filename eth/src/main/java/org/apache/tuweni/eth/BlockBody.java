@@ -50,6 +50,7 @@ public final class BlockBody {
 
   private final List<Transaction> transactions;
   private final List<BlockHeader> ommers;
+  private final List<Hash> ommerHashes;
 
   /**
    * Creates a new block body.
@@ -58,10 +59,22 @@ public final class BlockBody {
    * @param ommers the list of ommers for this block.
    */
   public BlockBody(List<Transaction> transactions, List<BlockHeader> ommers) {
+    this(transactions, null, ommers);
+  }
+
+  /**
+   * Creates a new incomplete block body where ommer block headers are missing, only their hashes
+   * are provided.
+   *
+   * @param transactions the list of transactions in this block.
+   * @param ommerHashes the list of ommer hashes for this block.
+   * @param ommers the list of ommers for this block.
+   */
+  BlockBody(List<Transaction> transactions, List<Hash> ommerHashes, List<BlockHeader> ommers) {
     requireNonNull(transactions);
-    requireNonNull(ommers);
     this.transactions = transactions;
     this.ommers = ommers;
+    this.ommerHashes = ommerHashes;
   }
 
   /**
@@ -82,21 +95,28 @@ public final class BlockBody {
     return ommers;
   }
 
+  /**
+   * Provides the block ommer hashes
+   *
+   * @return the list of ommer hashes for this block.
+   */
+  public List<Hash> getOmmerHashes() {
+    return ommerHashes;
+  }
+
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof BlockBody)) {
-      return false;
-    }
-    BlockBody other = (BlockBody) obj;
-    return transactions.equals(other.transactions) && ommers.equals(other.ommers);
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BlockBody blockBody = (BlockBody) o;
+    return Objects.equals(transactions, blockBody.transactions)
+        && Objects.equals(ommers, blockBody.ommers)
+        && Objects.equals(ommerHashes, blockBody.ommerHashes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(transactions, ommers);
+    return Objects.hash(transactions, ommers, ommerHashes);
   }
 
   /**
@@ -114,6 +134,9 @@ public final class BlockBody {
   }
 
   public void writeTo(RLPWriter writer) {
+    if (ommers == null) {
+      throw new IllegalArgumentException("Cannot write incomplete block body");
+    }
     writer.writeList(
         listWriter -> {
           for (Transaction tx : transactions) {

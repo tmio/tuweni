@@ -146,7 +146,7 @@ class JSONRPCClient(
     val body = JSONRPCRequest(
       StringOrLong(nextId()),
       "eth_getBlockByNumber",
-      arrayOf(blockNumber, includeTransactions),
+      arrayOf(UInt256.valueOf(blockNumber.toLong()).toShortHexString(), includeTransactions),
     )
     val jsonResponse = sendRequest(body).await()
     val err = jsonResponse.error

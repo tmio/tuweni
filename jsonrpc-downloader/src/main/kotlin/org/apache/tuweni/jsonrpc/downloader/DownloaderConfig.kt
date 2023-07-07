@@ -12,10 +12,11 @@ class DownloaderConfig(filePath: Path? = null, configContents: String? = null) {
 
     fun schema() = SchemaBuilder.create()
       .addInteger("numberOfThreads", 10, "Number of threads for each thread pool", null)
-      .addString("outputPath", "", "Path to output block data", null)
+      .addString("output", "", "Path to output block data", null)
       .addInteger("start", 0, "First block to scrape", null)
       .addInteger("end", null, "Last block to scrape. If unset, the scrape will continue to ask for new blocks", null)
       .addString("url", null, "URL of the JSON-RPC service to query for information", null)
+      .addBoolean("compressed", true, "Whether to export data as an archive (true by default), or as a folder", null)
       .toSchema()
   }
 
@@ -28,8 +29,10 @@ class DownloaderConfig(filePath: Path? = null, configContents: String? = null) {
   }
 
   fun numberOfThreads() = config.getInteger("numberOfThreads")
-  fun outputPath() = config.getString("outputPath")
+  fun outputPath() = config.getString("output")
   fun start() = config.getInteger("start")
   fun end() = config.getInteger("end")
   fun url() = config.getString("url")
+
+  fun compressed() = config.getBoolean("compressed")
 }

@@ -9,6 +9,7 @@ import io.vertx.core.VertxOptions
 import io.vertx.core.buffer.Buffer
 import io.vertx.kotlin.coroutines.await
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
@@ -21,14 +22,20 @@ import org.apache.tuweni.jsonrpc.JSONRPCClient
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.lang.Exception
 import java.lang.Integer.max
 import java.lang.Integer.min
+import java.net.URI
+import java.nio.charset.StandardCharsets
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 import java.security.Security
+import java.text.DecimalFormat
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.round
 import kotlin.system.exitProcess
@@ -72,6 +79,13 @@ object DownloaderApp {
         thread
       }
       val downloader = Downloader(vertx, config, pool.asCoroutineDispatcher())
+      Runtime.getRuntime().addShutdownHook(
+        Thread {
+          downloader.shutdown()
+          vertx.close()
+          pool.shutdown()
+        },
+      )
       logger.info("Starting download")
       try {
         downloader.loopDownload()
@@ -80,7 +94,7 @@ object DownloaderApp {
         exitProcess(1)
       }
       logger.info("Completed download")
-
+      downloader.shutdown()
       vertx.close()
       pool.shutdown()
     }
@@ -90,11 +104,15 @@ object DownloaderApp {
 class Downloader(val vertx: Vertx, val config: DownloaderConfig, override val coroutineContext: CoroutineContext) :
   CoroutineScope {
 
-  val jsonRpcClient: JSONRPCClient
+  val jsonRpcClients: List<JSONRPCClient>
   val objectMapper = ObjectMapper()
 
+  var compressedFile = AtomicReference<FileSystem>()
+
   init {
-    jsonRpcClient = JSONRPCClient(vertx, config.url(), coroutineContext = this.coroutineContext)
+    jsonRpcClients = MutableList(config.numberOfThreads()) {
+      JSONRPCClient(vertx, config.url(), coroutineContext = this.coroutineContext)
+    }.toList()
   }
 
   suspend fun loopDownload() = coroutineScope {
@@ -104,13 +122,30 @@ class Downloader(val vertx: Vertx, val config: DownloaderConfig, override val co
     val jobs = mutableListOf<Job>()
     var length = 0
     var completed = 0
+    var bytes = 0
+    if (config.compressed()) {
+      compressedFile.set(
+        FileSystems.newFileSystem(
+          URI.create("jar:${Paths.get(config.outputPath()).toUri()}"),
+          mapOf(Pair("create", "true")),
+        ),
+      )
+    }
     for (interval in intervals) {
       length += interval.last - interval.first
       for (i in interval) {
         val job = launch {
+          if (compressedFile.get() == null) {
+            return@launch
+          }
           try {
             val block = downloadBlock(i)
-            writeBlock(i, block)
+            bytes += block.length
+            if (config.compressed()) {
+              writeBlockCompressed(i, block)
+            } else {
+              writeBlockUncompressed(i, block)
+            }
           } catch (e: Exception) {
             logger.error("Error downloading block $i, aborting", e)
           }
@@ -119,25 +154,46 @@ class Downloader(val vertx: Vertx, val config: DownloaderConfig, override val co
         jobs.add(job)
       }
     }
-    launch {
+    launch(Dispatchers.Unconfined) {
+      var total = 0
       while (completed < length) {
         delay(5000)
-        logger.info("Progress ${round(completed * 100.0 * 100 / length) / 100}")
+        val delta = completed - total
+        total = completed
+        val dec = DecimalFormat("###,###,###,###,###")
+        logger.info(
+          "Progress ${round(completed * 100.0 * 100 / length) / 100}%, " +
+            "$delta blocks downloaded / $total total / ${dec.format(bytes)} bytes transferred",
+        )
       }
     }
     jobs.joinAll()
-    writeFinalState()
   }
 
   private suspend fun downloadBlock(blockNumber: Int): String {
+    val jsonRpcClient = jsonRpcClients[blockNumber % config.numberOfThreads()]
     val blockJson = jsonRpcClient.getBlockByBlockNumber(blockNumber, true)
     return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(blockJson)
   }
 
-  private suspend fun writeBlock(blockNumber: Int, block: String) {
-    val filePath = Paths.get(config.outputPath(), "block-${blockNumber.toString().padStart(16, '0')}.json")
+  private suspend fun writeBlockUncompressed(blockNumber: Int, block: String) {
+    val filePath = Paths.get(
+      config.outputPath(),
+      "block-${blockNumber.toString().padStart(16, '0')}.json",
+    )
     coroutineScope {
       vertx.fileSystem().writeFile(filePath.toString(), Buffer.buffer(block)).await()
+    }
+  }
+
+  private suspend fun writeBlockCompressed(blockNumber: Int, block: String) {
+    coroutineScope {
+      val newElt = compressedFile.get()?.getPath(
+        "block-${blockNumber.toString().padStart(16, '0')}.json",
+      ) ?: return@coroutineScope
+      Files.newBufferedWriter(newElt, StandardCharsets.UTF_8, StandardOpenOption.CREATE).use { writer ->
+        writer.write(block)
+      }
     }
   }
 
@@ -157,7 +213,17 @@ class Downloader(val vertx: Vertx, val config: DownloaderConfig, override val co
     // read the initial state
     var initialState = DownloadState(0, 0)
     try {
-      val str = Files.readString(Path.of(config.outputPath(), ".offset"))
+      val str = if (config.compressed()) {
+        FileSystems.newFileSystem(
+          URI.create("jar:${Paths.get(config.outputPath()).toUri()}"),
+          mapOf(Pair("create", "true")),
+        ).use {
+          val offsetFile = it.getPath(".offset")
+          Files.readString(offsetFile)
+        }
+      } else {
+        Files.readString(Path.of(config.outputPath(), ".offset"))
+      }
       initialState = objectMapper.readValue(str, object : TypeReference<DownloadState>() {})
     } catch (e: IOException) {
       // ignored
@@ -168,6 +234,23 @@ class Downloader(val vertx: Vertx, val config: DownloaderConfig, override val co
   private fun writeFinalState() {
     val state = DownloadState(config.start(), config.end())
     val json = objectMapper.writeValueAsString(state)
-    Files.writeString(Path.of(config.outputPath(), ".offset"), json)
+    if (config.compressed()) {
+      FileSystems.newFileSystem(
+        URI.create("jar:${Paths.get(config.outputPath()).toUri()}"),
+        mapOf(Pair("create", "true")),
+      ).use {
+        val offsetFile = it.getPath(".offset")
+        Files.writeString(offsetFile, json)
+      }
+    } else {
+      Files.writeString(Path.of(config.outputPath(), ".offset"), json)
+    }
+  }
+
+  fun shutdown() {
+    val f = compressedFile.get() ?: return
+    compressedFile.set(null)
+    f.close()
+    writeFinalState()
   }
 }
