@@ -26,7 +26,7 @@ on:
 jobs:
   assemble:
     timeout-minutes: 30
-    runs-on: [ self-hosted, Linux ]
+    runs-on: ubuntu-latest
     container:
       image: tmio/tuweni-build:1.2
     steps:
@@ -62,7 +62,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ github.sha }}
   test:
     timeout-minutes: 30
-    runs-on: [ self-hosted, Linux ]
+    runs-on: ubuntu-latest
     needs: assemble
     container:
       image: tmio/tuweni-build:1.2
@@ -124,7 +124,7 @@ jobs:
         run: cd distunzipped/tuweni && ./gradlew.bat assemble
   integration-tests:
     timeout-minutes: 30
-    runs-on: [ self-hosted, Linux ]
+    runs-on: ubuntu-latest
     needs: assemble
     container:
       image: tmio/tuweni-build:1.2
@@ -155,7 +155,7 @@ jobs:
   referenceTests:
     timeout-minutes: 30
     needs: assemble
-    runs-on: [ self-hosted, Linux ]
+    runs-on: ubuntu-latest
     container:
       image: tmio/tuweni-build:1.2
     steps:
