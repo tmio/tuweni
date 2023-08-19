@@ -47,5 +47,5 @@ cacheStoragePath="/var/jsonrpccache" # Cache location
 allowedMethods=[""] # All methods are enabled
 ```
 
-[beta]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#beta
-[application]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#application
+[beta]:https://github.com/tmio/tuweni/tree/main/docs/index.md#beta
+[application]:https://github.com/tmio/tuweni/tree/main/docs/index.md#application

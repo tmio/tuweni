@@ -31,5 +31,5 @@ $> stratum-proxy 16000
 
 
 
-[beta]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#beta
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[beta]:https://github.com/tmio/tuweni/tree/main/docs/index.md#beta
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library

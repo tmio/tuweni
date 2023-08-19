@@ -23,5 +23,5 @@ The library handles storing the private key of the wallet using symmetric encryp
 
 The library holds the private key in memory, and therefore is susceptible to memory dumps.
 
-[alpha]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#alpha
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[alpha]:https://github.com/tmio/tuweni/tree/main/docs/index.md#alpha
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library

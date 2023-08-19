@@ -26,5 +26,5 @@ The server accepts a [EthStatsServerController](https://tuweni.apache.org/docs/o
 You will need to implement your own controller. There is a controller for OpenTelemetry provided as example in this library, `OpenTelemetryServerController`.
 
 
-[alpha]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#alpha
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[alpha]:https://github.com/tmio/tuweni/tree/main/docs/index.md#alpha
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library

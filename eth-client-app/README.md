@@ -65,5 +65,5 @@ genesis="bar"
 path=other.json
 ```
 
-[prototype]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#prototype
-[application]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#application
+[prototype]:https://github.com/tmio/tuweni/tree/main/docs/index.md#prototype
+[application]:https://github.com/tmio/tuweni/tree/main/docs/index.md#application
