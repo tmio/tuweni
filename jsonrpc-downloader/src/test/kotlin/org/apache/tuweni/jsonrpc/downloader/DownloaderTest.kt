@@ -19,6 +19,7 @@ class DownloaderTest {
       start=10
       end=20
       url="example.com"
+      numberOfThreads=2
       """.trimIndent(),
     )
     val downloader = Downloader(vertx, config, Dispatchers.Default)
