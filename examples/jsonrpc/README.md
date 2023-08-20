@@ -28,7 +28,7 @@ This example requires Docker, Docker Compose 1.25, Java 11 and Gradle > 6.
 
 ### Check out this repository
 
-`$> git clone https://github.com/apache/incubator-tuweni`
+`$> git clone https://github.com/tmio/tuweni`
 
 ### Build the image
 
@@ -44,7 +44,7 @@ The build should end with similar lines:
 ```bash
  ---> be57b46c612c
 Successfully built be57b46c612c
-Successfully tagged apache-tuweni/tuweni:2.1.0-SNAPSHOT
+Successfully tagged tuweni/tuweni:2.1.0-SNAPSHOT
 Created image with ID 'be57b46c612c'.
 
 BUILD SUCCESSFUL in 1m 13s

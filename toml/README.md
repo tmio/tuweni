@@ -38,5 +38,5 @@ result.errors().forEach(error -> System.err.println(error.toString()));
 String value = result.getString("a. dotted . key");
 ```
 
-[stable]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#stable
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[stable]:https://github.com/tmio/tuweni/tree/main/docs/index.md#stable
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library

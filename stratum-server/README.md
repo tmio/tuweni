@@ -23,5 +23,5 @@ The server is compatible with the eth-proxy and Stratum1 protocols.
 
 The server accepts new work with the `setNewWork(powInput: PoWInput)` method, with a parameter of type [PowInput](https://tuweni.apache.org/docs/org.apache.tuweni.stratum.server/-po-w-input/index.html).
 
-[beta]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#beta
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[beta]:https://github.com/tmio/tuweni/tree/main/docs/index.md#beta
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library

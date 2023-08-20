@@ -1,8 +1,8 @@
 # Module tuweni
 
-Apache Tuweni is a set of libraries and other tools to aid development of blockchain and other decentralized software in Java and other JVM languages. It includes a low-level bytes library, serialization and deserialization codecs (e.g. RLP), various cryptography functions and primitives, and lots of other helpful utilities.
+Tuweni is a set of libraries and other tools to aid development of blockchain and other decentralized software in Java and other JVM languages. It includes a low-level bytes library, serialization and deserialization codecs (e.g. RLP), various cryptography functions and primitives, and lots of other helpful utilities.
 
-Learn more at [https://tuweni.apache.org].
+Learn more at [https://tuweni.tmio.io].
 
 # Gossip application
 
@@ -80,8 +80,8 @@ Peers are encoded as URIs using the TCP scheme: `tcp://127.0.0.1:3000`
 
 ## More information
 
-- [Official website](https://tuweni.apache.org)
-- [GitHub project](https://github.com/apache/incubator-tuweni)
+- [Official website](https://tuweni.tmio.io)
+- [GitHub project](https://github.com/tmio/tuweni)
 
 # License
 
@@ -148,8 +148,8 @@ hellohello
 
 ## More information
 
-- [Official website](https://tuweni.apache.org)
-- [GitHub project](https://github.com/apache/incubator-tuweni)
+- [Official website](https://tuweni.tmio.io)
+- [GitHub project](https://github.com/tmio/tuweni)
 
 
 # License

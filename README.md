@@ -1,6 +1,6 @@
 # Tuweni: Blockchain Libraries for Java (& Kotlin)
 
-[![Github build](https://github.com/tmio/incubator-tuweni/workflows/assemble/badge.svg)](https://github.com/tmio/tuweni/actions)
+[![Github build](https://github.com/tmio/tuweni/workflows/assemble/badge.svg)](https://github.com/tmio/tuweni/actions)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/tmio/tuweni/blob/main/LICENSE)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.tmio/tuweni-tuweni/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/io.tmio/tuweni-tuweni)
 
@@ -15,7 +15,7 @@ It includes a low-level bytes library, serialization and deserialization codecs 
 Tuweni is developed for JDK 11 or higher.
 
 ## Clone along with submodules ##
-    git clone https://github.com/apache/incubator-tuweni.git tuweni
+    git clone https://github.com/tmio/tuweni.git tuweni
     cd tuweni
     git submodule update --init --recursive
 
