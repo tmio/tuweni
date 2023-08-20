@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.jetbrains.annotations.Nullable;
 
 public class EthJsonModule extends SimpleModule {
 
@@ -216,20 +215,16 @@ public class EthJsonModule extends SimpleModule {
     }
 
     @Override
-    public Transaction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+    public Transaction deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException, JacksonException {
       JsonTransaction jt = p.readValueAs(JsonTransaction.class);
-      SECP256K1.Signature signature = SECP256K1.Signature.create(jt.v.get(0), jt.r.toUnsignedBigInteger(), jt.s.toUnsignedBigInteger());
+      SECP256K1.Signature signature =
+          SECP256K1.Signature.create(
+              jt.v.get(0), jt.r.toUnsignedBigInteger(), jt.s.toUnsignedBigInteger());
 
-      return new Transaction(jt.nonce,
-              jt.gasPrice,
-              jt.gas,
-              jt.to,
-              jt.value,
-              jt.input,
-              jt.chainId,
-              signature);
+      return new Transaction(
+          jt.nonce, jt.gasPrice, jt.gas, jt.to, jt.value, jt.input, jt.chainId, signature);
     }
-
   }
 
   static class UInt256Serializer extends StdSerializer<UInt256> {
