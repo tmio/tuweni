@@ -37,5 +37,5 @@ Note in Java, you should use [`AsyncMerkleStorage`](https://tuweni.apache.org/do
 
 An easy way to provide storage is to rely on a key-value store as defined in the [kv](https://tuweni.apache.org/docs/org.apache.tuweni.kv/index.html) library.
 
-[stable]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#stable
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[stable]:https://github.com/tmio/tuweni/tree/main/docs/index.md#stable
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library

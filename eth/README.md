@@ -20,6 +20,6 @@ specific language governing permissions and limitations under the License.
 This library represents domain objects related to the Ethereum blockchain.
 
 
-[beta]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#beta
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[beta]:https://github.com/tmio/tuweni/tree/main/docs/index.md#beta
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library
 

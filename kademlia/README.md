@@ -17,5 +17,5 @@ specific language governing permissions and limitations under the License.
 | Stability      | [beta]    |
 | Component Type | [library] |
 
-[beta]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#beta
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[beta]:https://github.com/tmio/tuweni/tree/main/docs/index.md#beta
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library
