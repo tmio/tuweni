@@ -198,7 +198,7 @@ class CachingPollingHandlerTest {
     val meter = meterSdk.get("handler")
     val handler = CachingPollingHandler(
       listOf(JSONRPCRequest(StringOrLong(1), "foo", arrayOf())),
-      1000,
+      100,
       kv,
       meter.counterBuilder("foo").build(),
       meter.counterBuilder("bar").build(),
@@ -209,7 +209,12 @@ class CachingPollingHandlerTest {
         JSONRPCResponse(id = StringOrLong(1))
       }
     }
-    delay(500)
+    for (i in (1..10)) {
+      if (map.size == 1) {
+        break
+      }
+      delay(50)
+    }
     assertEquals(1, map.size)
     handler.handleRequest(JSONRPCRequest(id = StringOrLong(1), method = "foo", params = arrayOf()))
     assertEquals(1, map.size)
