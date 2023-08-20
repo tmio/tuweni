@@ -35,5 +35,5 @@ The stores all implement [KeyValueStore](https://tuweni.apache.org/docs/org.apac
 
 The interface offers both coroutine-friendly methods (`getAsync`, `putAsync`) and asynchronous methods returning [`AsyncResult`](https://tuweni.apache.org/docs/org.apache.tuweni.concurrent/-async-result/index.html) or [`AsyncCompletion`](https://tuweni.apache.org/docs/org.apache.tuweni.concurrent/-async-completion/index.html) objects.
 
-[stable]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#stable
-[library]:https://github.com/apache/incubator-tuweni/tree/main/docs/index.md#library
+[stable]:https://github.com/tmio/tuweni/tree/main/docs/index.md#stable
+[library]:https://github.com/tmio/tuweni/tree/main/docs/index.md#library
