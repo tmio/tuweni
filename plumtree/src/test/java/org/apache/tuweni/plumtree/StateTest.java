@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
+import org.apache.tuweni.concurrent.AsyncCompletion;
+import org.apache.tuweni.concurrent.CompletableAsyncCompletion;
 import org.apache.tuweni.crypto.Hash;
 import org.apache.tuweni.junit.BouncyCastleExtension;
 
@@ -39,6 +41,8 @@ class StateTest {
     Bytes hash;
     Bytes payload;
 
+    CompletableAsyncCompletion waitForMessageSent;
+
     @Override
     public void sendMessage(
         Verb verb, Map<String, Bytes> attributes, Peer peer, Bytes hash, Bytes payload) {
@@ -46,6 +50,9 @@ class StateTest {
       this.peer = peer;
       this.hash = hash;
       this.payload = payload;
+      if (waitForMessageSent != null) {
+        waitForMessageSent.complete();
+      }
     }
   }
 
@@ -257,6 +264,7 @@ class StateTest {
   void receivePartialMessageFromLazyPeerAndNoFullMessage() throws Exception {
     EphemeralPeerRepository repo = new EphemeralPeerRepository();
     MockMessageSender messageSender = new MockMessageSender();
+    messageSender.waitForMessageSent = AsyncCompletion.incomplete();
     State state =
         new State(
             repo,
@@ -274,7 +282,7 @@ class StateTest {
     repo.moveToLazy(lazyPeer);
     Bytes message = Bytes32.random();
     state.receiveIHaveMessage(lazyPeer, message);
-    Thread.sleep(200);
+    messageSender.waitForMessageSent.join();
     assertEquals(message, messageSender.hash);
     assertEquals(lazyPeer, messageSender.peer);
     assertEquals(MessageSender.Verb.GRAFT, messageSender.verb);
