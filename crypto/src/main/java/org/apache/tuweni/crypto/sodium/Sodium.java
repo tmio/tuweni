@@ -117,7 +117,7 @@ public final class Sodium {
             .load(library.toString());
     initializeLibrary(lib);
 
-    synchronized (LibSodium.class) {
+    synchronized (Sodium.class) {
       Sodium.libSodium = lib;
     }
   }
@@ -158,14 +158,14 @@ public final class Sodium {
     LibSodium lib = loader.load(libraryName);
     initializeLibrary(lib);
 
-    synchronized (LibSodium.class) {
+    synchronized (Sodium.class) {
       Sodium.libSodium = lib;
     }
   }
 
   private static LibSodium libSodium() {
     if (libSodium == null) {
-      synchronized (LibSodium.class) {
+      synchronized (Sodium.class) {
         if (libSodium == null) {
           LibSodium lib =
               LibraryLoader.create(LibSodium.class)

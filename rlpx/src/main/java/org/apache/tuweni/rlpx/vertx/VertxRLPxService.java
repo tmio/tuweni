@@ -25,7 +25,9 @@ import org.apache.tuweni.rlpx.wire.SubProtocolHandler;
 import org.apache.tuweni.rlpx.wire.SubProtocolIdentifier;
 import org.apache.tuweni.rlpx.wire.WireConnection;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -164,8 +166,15 @@ public final class VertxRLPxService implements RLPxService {
     repository.addDisconnectionListener(
         c -> {
           if (keepAliveList.contains(c.peerPublicKey())) {
-
-            tryConnect(c.peerPublicKey(), new InetSocketAddress(c.peerHost(), c.peerPort()));
+            try {
+              InetAddress[] addresses = InetAddress.getAllByName(c.peerHost());
+              if (addresses.length == 0) {
+                throw new IllegalArgumentException("invalid host " + c.peerHost());
+              }
+              tryConnect(c.peerPublicKey(), new InetSocketAddress(addresses[0], c.peerPort()));
+            } catch (UnknownHostException e) {
+              throw new RuntimeException(e);
+            }
           }
         });
     if (meter != null) {
@@ -366,7 +375,16 @@ public final class VertxRLPxService implements RLPxService {
     if (!started.get()) {
       throw new IllegalStateException("The RLPx service is not active");
     }
-    return new InetSocketAddress(networkInterface, server.actualPort());
+    InetAddress[] addresses = new InetAddress[0];
+    try {
+      addresses = InetAddress.getAllByName(networkInterface);
+    } catch (UnknownHostException e) {
+      throw new RuntimeException(e);
+    }
+    if (addresses.length == 0) {
+      throw new RuntimeException("invalid host " + networkInterface);
+    }
+    return new InetSocketAddress(addresses[0], server.actualPort());
   }
 
   @Override
