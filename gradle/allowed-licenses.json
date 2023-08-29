@@ -54,6 +54,10 @@
       "moduleName": ".*"
     },
     {
+      "moduleLicense": "MIT-0",
+      "moduleName": ".*"
+    },
+    {
       "moduleLicense": "Bouncy Castle Licence",
       "moduleName": ".*"
     },
@@ -138,6 +142,10 @@
       "moduleName": ".*"
     },
     {
+      "moduleLicense": "PUBLIC DOMAIN",
+      "moduleName": ".*"
+    },
+    {
       "moduleLicense": ".*CDDL.*",
       "moduleName": ".*"
     },
@@ -148,6 +156,14 @@
     {
       "moduleLicense": "Creative Commons Legal Code",
       "moduleName": ".*"
+    },
+    {
+      "moduleLicense": "GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1",
+      "moduleName": "org.jboss.byteman:byteman-?.*"
+    },
+    {
+      "moduleLicense": null,
+      "moduleName": "com.google.guava:guava-parent"
     }
   ]
 }
