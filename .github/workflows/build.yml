@@ -30,7 +30,7 @@ jobs:
     container:
       image: tmio/tuweni-build:1.2
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up GPG key
@@ -67,7 +67,7 @@ jobs:
     container:
       image: tmio/tuweni-build:1.2
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 17
@@ -129,7 +129,7 @@ jobs:
     container:
       image: tmio/tuweni-build:1.2
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 17
@@ -159,7 +159,7 @@ jobs:
     container:
       image: tmio/tuweni-build:1.2
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 17
