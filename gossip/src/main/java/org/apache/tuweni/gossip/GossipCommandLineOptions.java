@@ -185,7 +185,7 @@ final class GossipCommandLineOptions {
     }
     peers();
     try {
-      InetAddress.getByName(networkInterface);
+      InetAddress.getAllByName(networkInterface);
     } catch (UnknownHostException e) {
       throw new IllegalArgumentException("Invalid network interface");
     }

@@ -12,7 +12,6 @@ import org.apache.tuweni.rlpx.RLPxMessage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +35,7 @@ public final class DefaultWireConnection implements WireConnection {
   private final Consumer<RLPxMessage> writer;
   private final Consumer<HelloMessage> afterHandshakeListener;
   private final Runnable disconnectHandler;
-  private final LinkedHashMap<SubProtocolIdentifier, SubProtocolHandler> subprotocols;
+  private final Map<SubProtocolIdentifier, SubProtocolHandler> subprotocols;
   private final int p2pVersion;
   private final String clientId;
   private final int advertisedPort;
@@ -76,7 +75,7 @@ public final class DefaultWireConnection implements WireConnection {
       Consumer<RLPxMessage> writer,
       Consumer<HelloMessage> afterHandshakeListener,
       Runnable disconnectHandler,
-      LinkedHashMap<SubProtocolIdentifier, SubProtocolHandler> subprotocols,
+      Map<SubProtocolIdentifier, SubProtocolHandler> subprotocols,
       int p2pVersion,
       String clientId,
       int advertisedPort,

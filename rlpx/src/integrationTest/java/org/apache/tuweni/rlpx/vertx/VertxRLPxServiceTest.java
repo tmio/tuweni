@@ -25,6 +25,7 @@ import org.apache.tuweni.rlpx.wire.SubProtocolHandler;
 import org.apache.tuweni.rlpx.wire.SubProtocolIdentifier;
 import org.apache.tuweni.rlpx.wire.WireConnection;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -207,7 +208,8 @@ class VertxRLPxServiceTest {
     WireConnection conn =
         service
             .connectTo(
-                peerPair.publicKey(), new InetSocketAddress("127.0.0.1", peerService.actualPort()))
+                peerPair.publicKey(),
+                new InetSocketAddress(InetAddress.getLoopbackAddress(), peerService.actualPort()))
             .get();
     assertEquals(DisconnectReason.USELESS_PEER, conn.getDisconnectReason());
     service.stop();
@@ -233,7 +235,7 @@ class VertxRLPxServiceTest {
           service
               .connectTo(
                   peerPair.publicKey(),
-                  new InetSocketAddress("127.0.0.1", peerService.actualPort()))
+                  new InetSocketAddress(InetAddress.getLoopbackAddress(), peerService.actualPort()))
               .get();
     } finally {
       service.stop();
