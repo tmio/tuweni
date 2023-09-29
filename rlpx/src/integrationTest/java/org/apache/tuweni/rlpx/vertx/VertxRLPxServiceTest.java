@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.vertx.core.Vertx;
-import org.bouncycastle.util.IPAddress;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -209,7 +208,8 @@ class VertxRLPxServiceTest {
     WireConnection conn =
         service
             .connectTo(
-                peerPair.publicKey(), new InetSocketAddress(InetAddress.getLoopbackAddress(), peerService.actualPort()))
+                peerPair.publicKey(),
+                new InetSocketAddress(InetAddress.getLoopbackAddress(), peerService.actualPort()))
             .get();
     assertEquals(DisconnectReason.USELESS_PEER, conn.getDisconnectReason());
     service.stop();
