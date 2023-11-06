@@ -153,7 +153,7 @@ class DNSResolver @JvmOverloads constructor(
         return null
       }
     } catch (e: DnsException) {
-      logger.warn("DNS query error with $domainName", e)
+      logger.debug("DNS query error with $domainName", e)
       return null
     } catch (e: IOException) {
       logger.warn("I/O exception contacting remote DNS server when resolving $domainName", e)
