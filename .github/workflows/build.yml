@@ -46,12 +46,12 @@ jobs:
         env:
           ENABLE_SIGNING: true
       - name: Upload source distrib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: distsrc
           path: dist/build/distributions/tuweni-src-*.zip
       - name: Upload binary distrib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: snapshot.zip
           path: dist/build/distributions/tuweni-bin-*.zip
@@ -85,7 +85,7 @@ jobs:
         run: gradle test
       - name: Archive Junit Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: junit-report
           path: '**/build/reports/tests/**'
@@ -147,7 +147,7 @@ jobs:
         run: gradle compileJava compileKotlin compileIntegrationTestJava compileIntegrationTestKotlin devp2p-eth:integrationTest devp2p-proxy:integrationTest devp2p:integrationTest dist:integrationTest dns-discovery:integrationTest eth-client-ui:integrationTest eth-client:integrationTest ethstats:integrationTest gossip:integrationTest hobbits-relayer:integrationTest hobbits:integrationTest plumtree-servlet:integrationTest plumtree-vertx:integrationTest rlpx:integrationTest
       - name: Archive Junit Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: junit-report
           path: '**/build/reports/tests/**'
@@ -177,7 +177,7 @@ jobs:
         run: gradle evm:referenceTest
       - name: Archive Junit Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: junit-report
           path: '**/build/reports/tests/**'

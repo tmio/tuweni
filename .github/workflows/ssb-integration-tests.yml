@@ -68,7 +68,7 @@ jobs:
         run: gradle scuttlebutt-client-lib:integrationTest scuttlebutt-discovery:integrationTest scuttlebutt-handshake:integrationTest scuttlebutt-rpc:integrationTest
       - name: Archive Junit Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: junit-report
           path: '**/build/reports/tests/**'
