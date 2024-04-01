@@ -565,7 +565,7 @@ dokkaHtml {
 
 project.task("checkNotice") {
   def lines = file("NOTICE").readLines()
-  def expected = "Copyright 2019-${LocalDate.now().getYear()} The Apache Software Foundation"
+  def expected = "Copyright 2023-${LocalDate.now().getYear()} The Machine Consultancy LLC"
   for (line in lines) {
     if (expected == line) {
       return
