@@ -12,16 +12,16 @@ public enum TomlVersion {
    * <p>This specification can be found at <a href=
    * "https://github.com/toml-lang/toml/blob/master/versions/en/toml-v0.4.0.md">https://github.com/toml-lang/toml/blob/master/versions/en/toml-v0.4.0.md</a>.
    */
-  V0_4_0(null),
+  V0_4_0(null, 0),
   /**
    * The 0.5.0 version of TOML.
    *
    * <p>This specification can be found at <a href=
    * "https://github.com/toml-lang/toml/blob/master/versions/en/toml-v0.5.0.md">https://github.com/toml-lang/toml/blob/master/versions/en/toml-v0.5.0.md</a>.
    */
-  V0_5_0(null),
+  V0_5_0(null, 1),
   /** The latest stable specification of TOML. */
-  LATEST(V0_5_0),
+  LATEST(V0_5_0, V0_5_0.index),
   /**
    * The head (development) specification of TOML.
    *
@@ -31,15 +31,18 @@ public enum TomlVersion {
    * <p>Note: As the specification is under active development, this implementation may not match
    * the latest changes.
    */
-  HEAD(null);
+  HEAD(null, 99);
 
   final TomlVersion canonical;
 
-  TomlVersion(@Nullable TomlVersion canonical) {
+  final int index;
+
+  TomlVersion(@Nullable TomlVersion canonical, int index) {
     this.canonical = canonical != null ? canonical : this;
+    this.index = index;
   }
 
   boolean after(TomlVersion other) {
-    return this.ordinal() > other.ordinal();
+    return this.index > other.index;
   }
 }

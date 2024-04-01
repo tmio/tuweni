@@ -22,6 +22,7 @@ dependencies {
   implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
   implementation 'io.opentelemetry:opentelemetry-exporter-otlp-metrics'
   implementation 'io.opentelemetry:opentelemetry-proto'
+  implementation 'io.opentelemetry.semconv:opentelemetry-semconv-incubating'
   implementation 'io.prometheus:simpleclient'
   implementation 'io.prometheus:simpleclient_httpserver'
 

@@ -55,6 +55,7 @@ dependencyManagement {
     dependency('io.opentelemetry:opentelemetry-extension-trace-propagators:1.2.0')
     dependency('io.opentelemetry:opentelemetry-proto:1.7.1-alpha')
     dependency('io.opentelemetry:opentelemetry-sdk:1.36.0')
+    dependency('io.opentelemetry.semconv:opentelemetry-semconv-incubating:1.24.0-alpha')
     dependency('io.opentelemetry:opentelemetry-sdk-trace:1.36.0')
     dependency('io.opentelemetry:opentelemetry-sdk-metrics:1.36.0')
     dependency('io.opentelemetry:opentelemetry-sdk-testing:1.36.0')
@@ -90,7 +91,7 @@ dependencyManagement {
       entry 'bcpkix-jdk15on'
       entry 'bcprov-jdk15on'
     }
-    dependencySet(group: 'org.eclipse.jetty', version: '12.0.7') {
+    dependencySet(group: 'org.eclipse.jetty', version: '11.0.20') {
       entry 'jetty-server'
       entry 'jetty-servlet'
       entry 'jetty-servlets'

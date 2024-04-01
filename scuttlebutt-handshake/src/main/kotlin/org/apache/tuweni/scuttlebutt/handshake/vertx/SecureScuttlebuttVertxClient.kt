@@ -8,6 +8,7 @@ import io.vertx.core.net.NetClient
 import io.vertx.core.net.NetClientOptions
 import io.vertx.core.net.NetSocket
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import org.apache.tuweni.bytes.Bytes
 import org.apache.tuweni.bytes.Bytes32
 import org.apache.tuweni.concurrent.AsyncCompletion
@@ -190,7 +191,7 @@ class SecureScuttlebuttVertxClient(
     handlerFactory: (sender: (Bytes) -> Unit, terminationFunction: () -> Unit) -> ClientHandler,
   ): ClientHandler {
     client = vertx.createNetClient(NetClientOptions().setTcpKeepAlive(true))
-    val socket = client!!.connect(port, host).await()
+    val socket = client!!.connect(port, host).coAwait()
     val h = NetSocketClientHandler(
       socket,
       remotePublicKey,

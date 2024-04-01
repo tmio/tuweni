@@ -5,6 +5,7 @@ package org.apache.tuweni.ethclient
 import io.vertx.core.Vertx
 import io.vertx.core.net.NetServerOptions
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.runBlocking
 import org.apache.tuweni.concurrent.AsyncResult
 import org.apache.tuweni.concurrent.coroutines.await
@@ -29,7 +30,7 @@ class ProxyEthereumClientTest {
         socket.write("Hello World!")
       }
     }
-    server.listen().await()
+    server.listen().coAwait()
 
     val identity = SECP256K1.KeyPair.random()
     val identity2 = SECP256K1.KeyPair.random()
@@ -90,7 +91,7 @@ class ProxyEthereumClientTest {
     val receivedMessage = AsyncResult.incomplete<String>()
 
     val netClient = vertx.createNetClient()
-    val socket = netClient.connect(15000, "127.0.0.1").await()
+    val socket = netClient.connect(15000, "127.0.0.1").coAwait()
     socket.handler {
       receivedMessage.complete(it.toString())
     }

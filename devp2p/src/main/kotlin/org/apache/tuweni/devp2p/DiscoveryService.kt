@@ -9,6 +9,7 @@ import io.vertx.core.buffer.Buffer
 import io.vertx.core.datagram.DatagramPacket
 import io.vertx.core.net.SocketAddress
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -335,7 +336,7 @@ internal class CoroutineDiscoveryService constructor(
   }
 
   fun start() = launch {
-    server.handler { receiveDatagram(it) }.listen(bindAddress.port(), bindAddress.host()).await()
+    server.handler { receiveDatagram(it) }.listen(bindAddress.port(), bindAddress.host()).coAwait()
     val endpoint = Endpoint(
       advertiseAddress ?: (server.localAddress()).host(),
       advertiseUdpPort ?: server.localAddress().port(),
@@ -428,7 +429,7 @@ internal class CoroutineDiscoveryService constructor(
   override suspend fun shutdown() {
     if (shutdown.compareAndSet(false, true)) {
       logger.info("{}: shutdown", serviceDescriptor)
-      server.close().await()
+      server.close().coAwait()
       for (pending in awaitingPongs.values) {
         pending.complete(null)
       }
@@ -916,6 +917,6 @@ internal class CoroutineDiscoveryService constructor(
   }
 
   private suspend fun sendPacket(address: SocketAddress, packet: Packet) {
-    server.send(Buffer.buffer(packet.encode().toArrayUnsafe()), address.port(), address.host()).await()
+    server.send(Buffer.buffer(packet.encode().toArrayUnsafe()), address.port(), address.host()).coAwait()
   }
 }

@@ -22,7 +22,7 @@ import io.vertx.core.Vertx
 import io.vertx.core.dns.DnsClient
 import io.vertx.core.dns.DnsClientOptions
 import io.vertx.core.dns.DnsException
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.runBlocking
 import org.apache.tuweni.concurrent.AsyncCompletion
 import org.apache.tuweni.concurrent.coroutines.asyncCompletion
@@ -145,7 +145,7 @@ class DNSResolver @JvmOverloads constructor(
    */
   suspend fun resolveRecordRaw(domainName: String): String? {
     try {
-      val records = dnsClient.resolveTXT(domainName).await()
+      val records = dnsClient.resolveTXT(domainName).coAwait()
       if (records.isNotEmpty()) {
         return records[0]
       } else {

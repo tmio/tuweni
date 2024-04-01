@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.vertx.core.Vertx
 import io.vertx.core.VertxOptions
 import io.vertx.core.buffer.Buffer
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -182,7 +182,7 @@ class Downloader(val vertx: Vertx, val config: DownloaderConfig, override val co
       "block-${blockNumber.toString().padStart(16, '0')}.json",
     )
     coroutineScope {
-      vertx.fileSystem().writeFile(filePath.toString(), Buffer.buffer(block)).await()
+      vertx.fileSystem().writeFile(filePath.toString(), Buffer.buffer(block)).coAwait()
     }
   }
 

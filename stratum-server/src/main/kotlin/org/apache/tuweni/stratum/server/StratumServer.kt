@@ -9,7 +9,7 @@ import io.vertx.core.net.NetServer
 import io.vertx.core.net.NetServerOptions
 import io.vertx.core.net.NetSocket
 import io.vertx.core.net.SelfSignedCertificate
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -102,7 +102,7 @@ class StratumServer(
       val server = vertx.createNetServer(options)
       server.exceptionHandler { e -> logger.error(e.message, e) }
       server.connectHandler(this::handleConnection)
-      server.listen().await()
+      server.listen().coAwait()
       tcpServer = server
     }
   }
@@ -136,7 +136,7 @@ class StratumServer(
 
   suspend fun stop() {
     if (started.compareAndSet(true, false)) {
-      tcpServer?.close()?.await()
+      tcpServer?.close()?.coAwait()
     }
   }
 

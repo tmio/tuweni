@@ -7,7 +7,7 @@ import io.vertx.core.buffer.Buffer
 import io.vertx.core.net.NetServer
 import io.vertx.core.net.NetServerOptions
 import io.vertx.core.net.NetSocket
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import org.apache.tuweni.bytes.Bytes
 import org.apache.tuweni.bytes.Bytes32
 import org.apache.tuweni.crypto.sodium.Signature
@@ -168,7 +168,7 @@ class SecureScuttlebuttVertxServer(
     server!!.connectHandler { netSocket: NetSocket ->
       NetSocketHandler().handle(netSocket)
     }
-    server!!.listen().await()
+    server!!.listen().coAwait()
   }
 
   /**
@@ -177,6 +177,6 @@ class SecureScuttlebuttVertxServer(
    * @return a handle to the completion of the operation
    */
   suspend fun stop() {
-    server!!.close().await()
+    server!!.close().coAwait()
   }
 }

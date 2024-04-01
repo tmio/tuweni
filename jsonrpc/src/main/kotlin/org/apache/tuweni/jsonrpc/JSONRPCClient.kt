@@ -48,7 +48,7 @@ class JSONRPCClient(
   val requestCounter = AtomicLong(1)
   val client = WebClient.create(
     vertx,
-    WebClientOptions().setUserAgent(userAgent).setTryUseCompression(true)
+    WebClientOptions().setUserAgent(userAgent).setDecompressionSupported(true)
       .setTracingPolicy(TracingPolicy.ALWAYS) as WebClientOptions,
   )
   val authorizationHeader = "Basic " + Base64.getEncoder()

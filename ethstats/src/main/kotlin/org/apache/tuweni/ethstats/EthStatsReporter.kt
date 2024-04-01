@@ -8,11 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import io.vertx.core.MultiMap
 import io.vertx.core.Vertx
-import io.vertx.core.http.HttpClient
-import io.vertx.core.http.HttpClientOptions
 import io.vertx.core.http.WebSocket
+import io.vertx.core.http.WebSocketClient
+import io.vertx.core.http.WebSocketClientOptions
 import io.vertx.core.http.WebSocketConnectOptions
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -89,7 +90,7 @@ class EthStatsReporter(
 
   val nodeInfo = NodeInfo(name, node, port, network, protocol, os = os, osVer = osVer)
   private val started = AtomicBoolean(false)
-  private var client: HttpClient? = null
+  private var client: WebSocketClient? = null
   private val newTxCount = AtomicReference<Int>()
   private val newHead = AtomicReference<BlockStats>()
   private val newNodeStats = AtomicReference<NodeStats>()
@@ -98,7 +99,7 @@ class EthStatsReporter(
 
   suspend fun start() {
     if (started.compareAndSet(false, true)) {
-      client = vertx.createHttpClient(HttpClientOptions().setLogActivity(true))
+      client = vertx.createWebSocketClient(WebSocketClientOptions().setLogActivity(true))
       startInternal()
     }
   }
@@ -144,7 +145,7 @@ class EthStatsReporter(
     val result = AsyncResult.incomplete<Boolean>()
     val options = WebSocketConnectOptions().setHost(uri.host).setPort(uri.port)
       .setHeaders(MultiMap.caseInsensitiveMultiMap().add("origin", "http://localhost"))
-    val ws = client!!.webSocket(options).await()
+    val ws = client!!.connect(options).coAwait()
     ws.closeHandler { launch { attemptConnect(uri) } }
     ws.exceptionHandler { e ->
       logger.debug("Error while communicating with ethnetstats", e)

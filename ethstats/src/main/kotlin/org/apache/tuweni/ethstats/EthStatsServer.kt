@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServer
 import io.vertx.core.http.ServerWebSocket
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.apache.tuweni.eth.EthJsonModule
@@ -43,13 +43,13 @@ class EthStatsServer(
     if (started.compareAndSet(false, true)) {
       server = vertx.createHttpServer().webSocketHandler(this::connect).exceptionHandler {
         logger.error("Exception occurred", it)
-      }.listen(port, networkInterface).await()
+      }.listen(port, networkInterface).coAwait()
     }
   }
 
   suspend fun stop() {
     if (started.compareAndSet(true, false)) {
-      server?.close()?.await()
+      server?.close()?.coAwait()
     }
   }
 

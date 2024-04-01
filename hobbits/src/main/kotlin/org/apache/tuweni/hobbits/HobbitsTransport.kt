@@ -8,9 +8,11 @@ import io.vertx.core.datagram.DatagramSocket
 import io.vertx.core.http.HttpClient
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.http.HttpServer
+import io.vertx.core.http.WebSocketClient
 import io.vertx.core.net.NetClient
 import io.vertx.core.net.NetServer
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.apache.tuweni.bytes.Bytes
@@ -51,6 +53,7 @@ class HobbitsTransport(
   private var exceptionHandler: ((Throwable) -> Unit)? = { }
 
   private var httpClient: HttpClient? = null
+  private var wsClient: WebSocketClient? = null
   private var tcpClient: NetClient? = null
   private var udpClient: DatagramSocket? = null
 
@@ -153,9 +156,9 @@ class HobbitsTransport(
     val completion = AsyncCompletion.incomplete()
     when (transport) {
       Transport.HTTP -> {
-        val req = httpClient!!.request(HttpMethod.POST, port, host, requestURI).await()
+        val req = httpClient!!.request(HttpMethod.POST, port, host, requestURI).coAwait()
           .exceptionHandler(exceptionHandler)
-        val response = req.send(Buffer.buffer(message.toBytes().toArrayUnsafe())).await()
+        val response = req.send(Buffer.buffer(message.toBytes().toArrayUnsafe())).coAwait()
         if (response.statusCode() == 200) {
           completion.complete()
         } else {
@@ -183,14 +186,14 @@ class HobbitsTransport(
       }
       Transport.WS -> {
         try {
-          val websocket = httpClient!!.webSocket(
+          val websocket = wsClient!!.connect(
             port,
             host,
             requestURI,
-          ).await()
+          ).coAwait()
           websocket.exceptionHandler(exceptionHandler)
-          websocket.writeBinaryMessage(Buffer.buffer(message.toBytes().toArrayUnsafe())).await()
-          websocket.end().await()
+          websocket.writeBinaryMessage(Buffer.buffer(message.toBytes().toArrayUnsafe())).coAwait()
+          websocket.end().coAwait()
           completion.complete()
         } catch (e: Exception) {
           completion.completeExceptionally(e)
@@ -242,6 +245,7 @@ class HobbitsTransport(
   suspend fun start() {
     if (started.compareAndSet(false, true)) {
       httpClient = vertx.createHttpClient()
+      wsClient = vertx.createWebSocketClient()
       tcpClient = vertx.createNetClient()
       udpClient = vertx.createDatagramSocket().exceptionHandler(exceptionHandler)
 
@@ -377,6 +381,7 @@ class HobbitsTransport(
   fun stop() {
     if (started.compareAndSet(true, false)) {
       httpClient!!.close()
+      wsClient!!.close()
       tcpClient!!.close()
       udpClient!!.close()
       for (server in httpServers.values) {

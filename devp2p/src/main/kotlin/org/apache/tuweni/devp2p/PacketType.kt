@@ -6,6 +6,8 @@ import org.apache.tuweni.bytes.Bytes
 import org.apache.tuweni.bytes.Bytes32
 import org.apache.tuweni.crypto.SECP256K1
 
+private const val MAX_VALUE: Byte = 0x7f
+
 /**
  * DevP2P discovery packet types
  * @param typeId the byte representing the type
@@ -86,7 +88,6 @@ internal enum class PacketType(
   }, ;
 
   companion object {
-    private const val MAX_VALUE: Byte = 0x7f
     private val INDEX = arrayOfNulls<PacketType?>(MAX_VALUE.toInt())
 
     init {
@@ -100,7 +101,7 @@ internal enum class PacketType(
   }
 
   init {
-    require(typeId <= PacketType.MAX_VALUE) { "Packet typeId must be in range [0x00, 0x80)" }
+    require(typeId <= MAX_VALUE) { "Packet typeId must be in range [0x00, 0x80)" }
   }
 
   abstract fun decode(

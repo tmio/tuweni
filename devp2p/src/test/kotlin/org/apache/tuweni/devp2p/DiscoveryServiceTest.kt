@@ -6,6 +6,7 @@ import io.vertx.core.Vertx
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.net.SocketAddress
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.apache.tuweni.bytes.Bytes
@@ -61,7 +62,7 @@ internal class DiscoveryServiceTest {
     val reference = AsyncResult.incomplete<Buffer>()
     val client = vertx.createDatagramSocket().handler { res ->
       reference.complete(res.data())
-    }.listen(0, "localhost").await()
+    }.listen(0, "localhost").coAwait()
     val clientEndpoint = Endpoint("192.168.1.1", 5678, 7654)
     val ping = PingPacket.create(
       clientKeyPair,
@@ -70,10 +71,10 @@ internal class DiscoveryServiceTest {
       Endpoint(address),
       null,
     )
-    client.send(Buffer.buffer(ping.encode().toArrayUnsafe()), address.port(), address.host()).await()
+    client.send(Buffer.buffer(ping.encode().toArrayUnsafe()), address.port(), address.host()).coAwait()
     val datagram = reference.await()
     val buffer = ByteBuffer.allocate(datagram.length())
-    datagram.byteBuf.readBytes(buffer)
+    buffer.put(datagram.bytes)
     val pong = Packet.decodeFrom(buffer) as PongPacket
     assertEquals(discoveryService.nodeId, pong.nodeId)
     assertEquals(ping.hash, pong.pingHash)
@@ -92,7 +93,7 @@ internal class DiscoveryServiceTest {
     reference.set(AsyncResult.incomplete())
     val bootstrapClient = vertx.createDatagramSocket().handler { res ->
       reference.get().complete(res.data())
-    }.listen(0, "127.0.0.1").await()
+    }.listen(0, "127.0.0.1").coAwait()
 
     val serviceKeyPair = SECP256K1.KeyPair.random()
     val peerRepository = EphemeralPeerRepository()
@@ -113,7 +114,7 @@ internal class DiscoveryServiceTest {
 
     val datagram = reference.get().await()
     val buffer = ByteBuffer.allocate(datagram.length())
-    datagram.byteBuf.readBytes(buffer)
+    buffer.put(datagram.bytes)
     val ping = Packet.decodeFrom(buffer) as PingPacket
     assertEquals(discoveryService.nodeId, ping.nodeId)
     assertEquals(
@@ -132,7 +133,7 @@ internal class DiscoveryServiceTest {
     )
     reference.set(AsyncResult.incomplete())
     val address = SocketAddress.inetSocketAddress(discoveryService.localPort, "127.0.0.1")
-    bootstrapClient.send(Buffer.buffer(pong.encode().toArrayUnsafe()), address.port(), address.host()).await()
+    bootstrapClient.send(Buffer.buffer(pong.encode().toArrayUnsafe()), address.port(), address.host()).coAwait()
 
     val findNodesDatagram = reference.get().await()
 
@@ -164,7 +165,7 @@ internal class DiscoveryServiceTest {
     val reference = AsyncResult.incomplete<Buffer>()
     val bootstrapClient = vertx.createDatagramSocket().handler { res ->
       reference.complete(res.data())
-    }.listen(0, "localhost").await()
+    }.listen(0, "localhost").coAwait()
 
     val serviceKeyPair = SECP256K1.KeyPair.random()
     val peerRepository = EphemeralPeerRepository()
@@ -184,7 +185,7 @@ internal class DiscoveryServiceTest {
     )
     val datagram = reference.await()
     val buffer = ByteBuffer.allocate(datagram.length())
-    datagram.byteBuf.readBytes(buffer)
+    buffer.put(datagram.bytes)
     val ping = Packet.decodeFrom(buffer) as PingPacket
     assertEquals(discoveryService.nodeId, ping.nodeId)
     assertEquals(
@@ -202,7 +203,7 @@ internal class DiscoveryServiceTest {
       null,
     )
     val address = SocketAddress.inetSocketAddress(discoveryService.localPort, "127.0.0.1")
-    bootstrapClient.send(Buffer.buffer(pong.encode().toArrayUnsafe()), address.port(), address.host()).await()
+    bootstrapClient.send(Buffer.buffer(pong.encode().toArrayUnsafe()), address.port(), address.host()).coAwait()
 
     delay(1000)
     val bootstrapPeer =
@@ -225,7 +226,7 @@ internal class DiscoveryServiceTest {
     val reference = AsyncResult.incomplete<Buffer>()
     val bootstrapClient = vertx.createDatagramSocket().handler { res ->
       reference.complete(res.data())
-    }.listen(0, "localhost").await()
+    }.listen(0, "localhost").coAwait()
 
     val discoveryService = DiscoveryService.open(
       vertx,
@@ -244,7 +245,7 @@ internal class DiscoveryServiceTest {
 
     val datagram = reference.await()
     val buffer = ByteBuffer.allocate(datagram.length())
-    datagram.byteBuf.readBytes(buffer)
+    buffer.put(datagram.bytes)
     val ping = Packet.decodeFrom(buffer) as PingPacket
     assertEquals(discoveryService.nodeId, ping.nodeId)
     assertEquals(
@@ -264,7 +265,7 @@ internal class DiscoveryServiceTest {
     reference.set(AsyncResult.incomplete())
     val bootstrapClient = vertx.createDatagramSocket().handler { res ->
       reference.get().complete(res.data())
-    }.listen(0, "localhost").await()
+    }.listen(0, "localhost").coAwait()
 
     val discoveryService = DiscoveryService.open(
       vertx,
@@ -280,7 +281,7 @@ internal class DiscoveryServiceTest {
     val datagram1 = reference.get().await()
     reference.set(AsyncResult.incomplete())
     val buffer1 = ByteBuffer.allocate(datagram1.length())
-    datagram1.byteBuf.readBytes(buffer1)
+    buffer1.put(datagram1.bytes)
     val ping1 = Packet.decodeFrom(buffer1) as PingPacket
     assertEquals(discoveryService.nodeId, ping1.nodeId)
     assertEquals(
@@ -290,7 +291,7 @@ internal class DiscoveryServiceTest {
     val datagram2 = reference.get().await()
     reference.set(AsyncResult.incomplete())
     val buffer2 = ByteBuffer.allocate(datagram2.length())
-    datagram2.byteBuf.readBytes(buffer2)
+    buffer2.put(datagram2.bytes)
     val ping2 = Packet.decodeFrom(buffer2) as PingPacket
     assertEquals(discoveryService.nodeId, ping2.nodeId)
     assertEquals(
@@ -300,7 +301,7 @@ internal class DiscoveryServiceTest {
     val datagram3 = reference.get().await()
     reference.set(AsyncResult.incomplete())
     val buffer3 = ByteBuffer.allocate(datagram3.length())
-    datagram3.byteBuf.readBytes(buffer3)
+    buffer3.put(datagram3.bytes)
     val ping3 = Packet.decodeFrom(buffer3) as PingPacket
     assertEquals(discoveryService.nodeId, ping3.nodeId)
     assertEquals(
@@ -328,18 +329,18 @@ internal class DiscoveryServiceTest {
     reference.set(AsyncResult.incomplete())
     val client = vertx.createDatagramSocket().handler { res ->
       reference.get().complete(res.data())
-    }.listen(0, "localhost").await()
+    }.listen(0, "localhost").coAwait()
     val findNodes =
       FindNodePacket.create(
         clientKeyPair,
         System.currentTimeMillis(),
         SECP256K1.KeyPair.random().publicKey(),
       )
-    client.send(Buffer.buffer(findNodes.encode().toArrayUnsafe()), address.port(), address.host()).await()
+    client.send(Buffer.buffer(findNodes.encode().toArrayUnsafe()), address.port(), address.host()).coAwait()
 
     val datagram = reference.get().await()
     val buffer = ByteBuffer.allocate(datagram.length())
-    datagram.byteBuf.readBytes(buffer)
+    buffer.put(datagram.bytes)
     val ping = Packet.decodeFrom(buffer) as PingPacket
     assertEquals(discoveryService.nodeId, ping.nodeId)
 
@@ -355,11 +356,11 @@ internal class DiscoveryServiceTest {
     )
 
     reference.set(AsyncResult.incomplete())
-    client.send(Buffer.buffer(pong.encode().toArrayUnsafe()), address.port(), address.host()).await()
+    client.send(Buffer.buffer(pong.encode().toArrayUnsafe()), address.port(), address.host()).coAwait()
 
     val datagram2 = reference.get().await()
     val buffer2 = ByteBuffer.allocate(datagram2.length())
-    datagram2.byteBuf.readBytes(buffer2)
+    buffer2.put(datagram2.bytes)
     val neighbors = Packet.decodeFrom(buffer2) as NeighborsPacket
     assertEquals(discoveryService.nodeId, neighbors.nodeId)
 

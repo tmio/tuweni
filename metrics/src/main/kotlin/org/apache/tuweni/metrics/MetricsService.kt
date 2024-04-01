@@ -12,7 +12,7 @@ import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
-import io.opentelemetry.semconv.resource.attributes.ResourceAttributes
+import io.opentelemetry.semconv.incubating.ServiceIncubatingAttributes
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -46,7 +46,7 @@ class MetricsService(
     val resource = Resource.getDefault()
       .merge(
         Resource.create(
-          Attributes.builder().put(ResourceAttributes.SERVICE_NAME, jobName).build(),
+          Attributes.builder().put(ServiceIncubatingAttributes.SERVICE_NAME, jobName).build(),
         ),
       )
     val sdkMeterProviderBuilder = SdkMeterProvider.builder().setResource(resource)

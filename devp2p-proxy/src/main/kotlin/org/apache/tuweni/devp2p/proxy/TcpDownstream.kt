@@ -6,12 +6,11 @@ import io.vertx.core.Vertx
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.net.NetServer
 import io.vertx.core.net.NetSocket
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import org.apache.tuweni.bytes.Bytes
-import org.apache.tuweni.concurrent.coroutines.await
 import org.slf4j.LoggerFactory
 import kotlin.coroutines.CoroutineContext
 
@@ -34,7 +33,7 @@ class TcpDownstream(
     val server = vertx.createNetServer()
     server.connectHandler {
       handleSocket(it)
-    }.listen(port, host).await()
+    }.listen(port, host).coAwait()
     tcpServer = server
     logger.info("Started downstream proxy server on $host:$port")
   }

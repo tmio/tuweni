@@ -10,7 +10,7 @@ import org.apache.lucene.search.BooleanQuery
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.ScoreDoc
 import org.apache.lucene.search.TermQuery
-import org.apache.lucene.search.TopScoreDocCollector
+import org.apache.lucene.search.TopScoreDocCollectorManager
 import org.apache.lucene.store.Directory
 import org.apache.lucene.util.BytesRef
 import org.apache.tuweni.bytes.Bytes
@@ -65,12 +65,12 @@ internal class BlockchainIndexTest {
 
     val reader = DirectoryReader.open(writer)
     val searcher = IndexSearcher(reader)
-    val collector = TopScoreDocCollector.create(10, ScoreDoc(1, 1.0f), 1)
+    val collector = TopScoreDocCollectorManager(10, ScoreDoc(1, 1.0f), 1)
     val query = BooleanQuery.Builder()
       .add(TermQuery(Term("_id", BytesRef(header.hash.toArrayUnsafe()))), BooleanClause.Occur.MUST)
       .add(TermQuery(Term("_type", "block")), BooleanClause.Occur.MUST)
     searcher.search(query.build(), collector)
-    val hits = collector.topDocs().scoreDocs
+    val hits = collector.newCollector().topDocs().scoreDocs
     assertEquals(1, hits.size)
   }
 
@@ -100,12 +100,12 @@ internal class BlockchainIndexTest {
 
     val reader = DirectoryReader.open(index)
     val searcher = IndexSearcher(reader)
-    val collector = TopScoreDocCollector.create(10, ScoreDoc(1, 1.0f), 1)
+    val collector = TopScoreDocCollectorManager(10, ScoreDoc(1, 1.0f), 1)
     val query = BooleanQuery.Builder()
       .add(TermQuery(Term("_id", BytesRef(header.hash.toArrayUnsafe()))), BooleanClause.Occur.MUST)
       .add(TermQuery(Term("_type", "block")), BooleanClause.Occur.MUST)
     searcher.search(query.build(), collector)
-    val hits = collector.topDocs().scoreDocs
+    val hits = collector.newCollector().topDocs().scoreDocs
     assertEquals(1, hits.size)
   }
 

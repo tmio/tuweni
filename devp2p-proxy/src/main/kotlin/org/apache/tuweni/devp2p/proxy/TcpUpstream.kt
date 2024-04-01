@@ -6,6 +6,7 @@ import io.vertx.core.Vertx
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.net.NetClient
 import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,7 +34,7 @@ class TcpUpstream(
   }
 
   override suspend fun handleRequest(message: Bytes): Bytes {
-    val socket = tcpclient!!.connect(port, host).await()
+    val socket = tcpclient!!.connect(port, host).coAwait()
 
     val result = AsyncResult.incomplete<Bytes>()
     socket.handler {
@@ -44,7 +45,7 @@ class TcpUpstream(
     }.exceptionHandler {
       result.completeExceptionally(it)
     }
-    socket.write(Buffer.buffer(message.toArrayUnsafe())).await()
+    socket.write(Buffer.buffer(message.toArrayUnsafe())).coAwait()
 
     return result.await()
   }

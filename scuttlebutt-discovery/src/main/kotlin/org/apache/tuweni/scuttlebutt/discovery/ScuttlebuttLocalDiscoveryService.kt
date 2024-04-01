@@ -7,7 +7,7 @@ import io.vertx.core.AsyncResult
 import io.vertx.core.Vertx
 import io.vertx.core.datagram.DatagramPacket
 import io.vertx.core.datagram.DatagramSocket
-import io.vertx.kotlin.coroutines.await
+import io.vertx.kotlin.coroutines.coAwait
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Consumer
@@ -70,7 +70,7 @@ class ScuttlebuttLocalDiscoveryService(
       }.listen(
         listenPort,
         listenNetworkInterface,
-      ).await()
+      ).coAwait()
       timerId = vertx.setPeriodic(60000) { broadcast() }
     }
   }
@@ -115,7 +115,7 @@ class ScuttlebuttLocalDiscoveryService(
   suspend fun stop() {
     if (started.compareAndSet(true, false)) {
       vertx.cancelTimer(timerId)
-      udpSocket?.close()?.await()
+      udpSocket?.close()?.coAwait()
     }
   }
 
