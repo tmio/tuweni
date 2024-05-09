@@ -175,7 +175,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ github.sha }}
       - name: gradle evm:referenceTest
         env:
-          GRADLE_OPTS: "-Xmx2048m"
+          GRADLE_OPTS: "-Xmx4096m"
         run: gradle evm:referenceTest
       - name: Archive Junit Report
         if: always()
