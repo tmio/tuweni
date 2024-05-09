@@ -28,12 +28,12 @@ buildscript {
 plugins {
   id 'com.diffplug.spotless' version '6.22.0'
   id 'net.ltgt.errorprone' version '3.1.0'
-  id 'org.springframework.boot' version '3.1.5'
+  id 'org.springframework.boot' version '3.2.4'
   id 'io.spring.dependency-management' version '1.1.3'
   id 'org.gradle.crypto.checksum' version '1.4.0'
-  id 'org.jetbrains.kotlin.jvm' version '1.9.10'
-  id 'org.jetbrains.kotlin.plugin.spring' version '1.9.10'
-  id 'org.jetbrains.dokka' version '1.9.10'
+  id 'org.jetbrains.kotlin.jvm' version '1.9.23'
+  id 'org.jetbrains.kotlin.plugin.spring' version '1.9.23'
+  id 'org.jetbrains.dokka' version '1.9.20'
   id 'maven-publish'
   id 'se.patrikerdes.use-latest-versions' version '0.2.18'
   id 'com.github.ben-manes.versions' version '0.49.0'
@@ -565,7 +565,7 @@ dokkaHtml {
 
 project.task("checkNotice") {
   def lines = file("NOTICE").readLines()
-  def expected = "Copyright 2019-${LocalDate.now().getYear()} The Apache Software Foundation"
+  def expected = "Copyright 2023-${LocalDate.now().getYear()} The Machine Consultancy LLC"
   for (line in lines) {
     if (expected == line) {
       return
