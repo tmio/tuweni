@@ -98,7 +98,7 @@ jobs:
     needs: assemble
     steps:
       - name: Download distsrc
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download
         with:
           name: distsrc
