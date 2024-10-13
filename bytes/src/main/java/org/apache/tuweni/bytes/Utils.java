@@ -56,7 +56,8 @@ class Checks {
   }
 
   @FormatMethod
-  static void checkArgument(boolean condition, String message, int arg1, int arg2, int arg3, int arg4) {
+  static void checkArgument(
+      boolean condition, String message, int arg1, int arg2, int arg3, int arg4) {
     if (!condition) {
       throw new IllegalArgumentException(String.format(message, arg1, arg2, arg3, arg4));
     }
