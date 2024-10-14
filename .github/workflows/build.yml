@@ -42,7 +42,7 @@ jobs:
           java-version: 17
           cache: gradle
       - name: gradle assemble
-        run: gradle assemble compileTestJava compileIntegrationTestJava -x test -Psignatory.keyId=38F6C7215DD49C32 -Psigning.gnupg.keyName=38F6C7215DD49C32 -Psigning.gnupg.executable=gpg
+        run: gradle assemble compileTestJava compileIntegrationTestJava -x test -Psignatory.keyId=90010D4396A46BAF -Psigning.gnupg.keyName=90010D4396A46BAF -Psigning.gnupg.executable=gpg
         env:
           ENABLE_SIGNING: true
       - name: Upload source distrib
