@@ -35,7 +35,7 @@ plugins {
   id 'org.jetbrains.kotlin.plugin.spring' version '1.9.23'
   id 'org.jetbrains.dokka' version '1.9.20'
   id 'maven-publish'
-  id 'se.patrikerdes.use-latest-versions' version '0.2.18'
+  id 'se.patrikerdes.use-latest-versions' version '0.2.19'
   id 'com.github.ben-manes.versions' version '0.49.0'
 }
 
